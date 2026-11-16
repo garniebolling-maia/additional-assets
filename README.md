@@ -15,3 +15,11 @@
   </p>
 
 
+
+<h3>From Matillion ETL to Maia</h3>
+
+<p>
+  <a href="https://garniebolling-maia.github.io/additional-assets/maia-matillion-etl-to-maia.html" target="_blank" rel="noopener"><strong>Open the interactive walkthrough</strong></a>
+  <br>
+  A guided path for Matillion ETL customers learning Maia. It shows what carries over, what changes and where Maia Team helps, from mapping familiar concepts through the Upgrade Assistant, validation and release.
+</p>
