@@ -192,6 +192,15 @@ footer.site a, main a { color: var(--accent-c); }
 .dots button[aria-current="true"] { background: var(--yellow-500); border-color: var(--yellow-500); }
 .dots button.done { background: var(--pg-text-2); border-color: var(--pg-text-2); }
 .hint { font-size: 13px; color: var(--pg-muted); margin-top: 10px; }
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.head-row h2 { margin: 0; }
+.pill { font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; border-radius: 999px; padding: 10px 28px; background: var(--yellow-500); border: 1.5px solid var(--yellow-500); color: var(--green-900); }
+.pill:hover { background: var(--yellow-400); border-color: var(--yellow-400); }
+.pill:focus-visible { outline: 3px solid var(--yellow-500); outline-offset: 2px; }
+.diagram-card { position: relative; }
+.start-hint { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; color: #4d4d4d; font-size: 16px; padding: 0 24px; pointer-events: none; }
+.intro h3 { font-size: 22px; margin: 4px 0 10px; }
+.intro p { margin: 0 0 12px; }
 .no-js-hide { display: none; }
 .js .no-js-hide { display: inline-block; }
 
@@ -245,11 +254,12 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 
   <section>
     <p class="tag">Build it step by step</p>
-    <h2>From first setup to a pipeline in production</h2>
+    <div class="head-row"><h2>From first setup to a pipeline in production</h2><button type="button" id="start" class="pill no-js-hide">Start</button></div>
     <p class="sec-lede">Step through the path. The diagram grows as each stage is added, and yellow marks the Maia capability used at that point.</p>
 
     <div class="stepper" id="stepper" tabindex="-1">
       <div class="diagram-card">
+        <div class="start-hint" id="start-hint" hidden>Press Start to build the path one stage at a time</div>
         <svg viewBox="0 0 680 480" role="img" aria-labelledby="d-title d-desc">
           <title id="d-title">A best-practice path with Maia</title>
           <desc id="d-desc">Three phases. Set up: foundations and your standards. Build: plan, build and validate. Release and run: review and release, then run and monitor, with what you learn feeding back into your standards.</desc>
@@ -352,6 +362,12 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 
       <div>
         <div class="panel" aria-live="polite">
+
+          <div class="intro" id="intro" hidden>
+            <p class="tag">Before you start</p>
+            <h3>Seven steps, one path</h3>
+            <p>Press Start to build the diagram one stage at a time. Each step explains what happens and which Maia capability is used. You can also show everything at once.</p>
+          </div>
 
           <article class="step-card" data-step="0">
             <p class="tag">Step 1 of 7</p>
@@ -563,6 +579,10 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
   var total = cards.length;
   var cur = 0;
   var showAll = false;
+  var started = false;
+  var startBtn = document.getElementById('start');
+  var introEl = document.getElementById('intro');
+  var hintEl = document.getElementById('start-hint');
   var dots = [];
 
   document.documentElement.classList.add('js');
@@ -572,7 +592,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
       var b = document.createElement('button');
       b.type = 'button';
       b.setAttribute('aria-label', 'Go to step ' + (n + 1) + ' of ' + total);
-      b.addEventListener('click', function () { showAll = false; cur = n; render(); });
+      b.addEventListener('click', function () { started = true; showAll = false; cur = n; render(); });
       dotsEl.appendChild(b);
       dots.push(b);
     })(i);
@@ -583,30 +603,35 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
     groups.forEach(function (g) {
       var n = parseInt(g.getAttribute('data-step'), 10);
       g.classList.remove('on', 'past', 'off');
-      if (showAll) { g.classList.add('on'); }
+      if (!started) { g.classList.add('off'); }
+      else if (showAll) { g.classList.add('on'); }
       else if (n < cur) { g.classList.add('past'); }
       else if (n === cur) { g.classList.add('on'); }
       else { g.classList.add('off'); }
     });
     cards.forEach(function (c) {
       var n = parseInt(c.getAttribute('data-step'), 10);
-      c.hidden = !(showAll || n === cur);
+      c.hidden = !started || !(showAll || n === cur);
     });
     dots.forEach(function (d, n) {
-      d.setAttribute('aria-current', (!showAll && n === cur) ? 'true' : 'false');
-      d.classList.toggle('done', showAll || n < cur);
+      d.setAttribute('aria-current', (started && !showAll && n === cur) ? 'true' : 'false');
+      d.classList.toggle('done', started && (showAll || n < cur));
     });
-    back.disabled = showAll || cur === 0;
-    next.disabled = showAll || cur === total - 1;
+    back.disabled = !started || showAll || cur === 0;
+    next.disabled = !started || showAll || cur === total - 1;
+    introEl.hidden = started;
+    hintEl.hidden = started;
+    startBtn.textContent = started ? 'Restart' : 'Start';
     allBtn.textContent = showAll ? 'Step through' : 'Show everything';
     allBtn.setAttribute('aria-pressed', showAll ? 'true' : 'false');
   }
 
   back.addEventListener('click', function () { if (cur > 0) { cur--; render(); } });
   next.addEventListener('click', function () { if (cur < total - 1) { cur++; render(); } });
-  allBtn.addEventListener('click', function () { showAll = !showAll; render(); });
+  allBtn.addEventListener('click', function () { started = true; showAll = !showAll; render(); });
+  startBtn.addEventListener('click', function () { started = true; showAll = false; cur = 0; render(); });
   stepper.addEventListener('keydown', function (e) {
-    if (showAll) { return; }
+    if (!started || showAll) { return; }
     if (e.key === 'ArrowRight' && cur < total - 1) { cur++; render(); e.preventDefault(); }
     if (e.key === 'ArrowLeft' && cur > 0) { cur--; render(); e.preventDefault(); }
   });
