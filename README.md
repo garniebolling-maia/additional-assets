@@ -23,3 +23,13 @@
   <br>
   A guided path for Matillion ETL customers learning Maia. It shows what carries over, what changes and where Maia Team helps, from mapping familiar concepts through the Upgrade Assistant, validation and release.
 </p>
+
+
+
+<h3>Maia security and AI questions</h3>
+
+<p>
+  <a href="https://garniebolling-maia.github.io/additional-assets/maia-security-and-ai-questions.html" target="_blank" rel="noopener"><strong>Open the security and AI questions</strong></a>
+  <br>
+  Straight answers for teams evaluating Maia: how it handles your data, how its AI features work and what controls you have, plus access, deployment options and compliance. Includes 25 questions with topic filters and links to the Trust Center.
+</p>
