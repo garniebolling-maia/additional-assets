@@ -10,7 +10,7 @@
 
 <h3>Maia architecture</h3>
 <p>
-  <a href="maia-architecture-diagram.html" target="_blank" rel="noopener">Open the interactive architecture</a><br>
+  <a href="https://garniebolling-maia.github.io/additional-assets/maia-architecture-diagram.html" target="_blank" rel="noopener">Open the interactive architecture</a><br>
   How Maia fits together for Hybrid SaaS and Full SaaS, with TLS, data flows and controls.
 </p>
 
