@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maia architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,600&display=swap" rel="stylesheet">
+<style>
+/* Matillion / Maia brand tokens and base styles (2026 guidelines). */
+:root {
+  /* Greens */
+  --green-900: #002e2b; --green-700: #20514e; --green-500: #477a75;
+  --teal-300: #87c7c0; --teal-200: #b7ddd9; --teal-100: #cfe9e6; --teal-50: #e7f4f2;
+  /* Yellows */
+  --yellow-900: #4d3400; --yellow-700: #9a6700; --yellow-500: #ffc000;
+  --yellow-400: #ffcd33; --yellow-300: #ffd966; --yellow-200: #ffe699; --yellow-100: #fff2cc;
+  --cream: #fffae9;
+  /* Blues (supporting) */
+  --blue-950: #031c33; --blue-900: #004a6b; --blue-700: #007ca5; --blue-400: #7dd0f4;
+  --blue-300: #b1e3f8; --blue-200: #cbecfb; --blue-100: #e5f6fd;
+  /* Greys */
+  --grey-800: #333333; --grey-700: #4d4d4d; --grey-500: #808080; --grey-400: #b3b3b3;
+  --grey-300: #d1d1d1; --grey-200: #e1e1e1; --grey-100: #f0f0f0;
+
+  /* Semantic */
+  --bg: #ffffff; --bg-soft: var(--cream); --surface: var(--grey-100);
+  --text: var(--green-900); --text-2: var(--green-700); --text-muted: var(--grey-700);
+  --accent: var(--yellow-500); --accent-text: var(--yellow-700);
+  --rule: var(--grey-200);
+
+  --font-sans: 'Inter', Arial, Helvetica, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --radius: 10px;
+  --chart-1: #002e2b; --chart-2: #ffc000; --chart-3: #477a75; --chart-4: #007ca5;
+  --chart-5: #87c7c0; --chart-6: #ffd966; --chart-7: #7dd0f4; --chart-8: #808080;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg-soft); color: var(--text); font-family: var(--font-sans); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+/* Headline pairing: serif setup + Inter Bold punch */
+.display { font-size: clamp(36px, 6vw, 60px); line-height: 1.08; margin: 0; letter-spacing: -0.02em; color: var(--green-900); }
+.display .serif, .serif { font-family: var(--font-serif); font-weight: 300; letter-spacing: -0.01em; }
+.display .bold { font-family: var(--font-sans); font-weight: 700; display: block; }
+em.accent, .accent-italic { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent-text); }
+.on-dark em.accent, .on-dark .accent-italic { color: var(--yellow-500); }
+
+h1, h2, h3 { font-family: var(--font-sans); color: var(--green-900); letter-spacing: -0.01em; margin: 0 0 .5em; }
+h1 { font-size: clamp(32px, 4.5vw, 48px); font-weight: 700; line-height: 1.1; }
+h2 { font-size: clamp(24px, 3vw, 30px); font-weight: 700; line-height: 1.2; }
+h3 { font-size: 20px; font-weight: 600; line-height: 1.3; }
+p { margin: 0 0 1em; }
+.lede { font-family: var(--font-serif); font-weight: 300; font-size: 22px; line-height: 1.4; color: var(--green-700); }
+.tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--grey-500); font-weight: 500; }
+
+/* Page furniture */
+.topbar { display: flex; align-items: center; gap: 10px; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.topbar img, .topbar svg { height: 22px; width: auto; }
+.topbar .page { margin-left: auto; }
+
+/* Panels */
+.hero { background: var(--green-900); color: #fff; padding: 56px 0 64px; }
+.hero .display, .hero h1, .hero h2 { color: #fff; }
+.hero .lede { color: var(--teal-200); }
+.hero .logo svg, .hero .logo img { height: 56px; width: auto; }
+.band-yellow { background: var(--yellow-400); color: var(--green-900); }
+.on-dark { color: #fff; }
+
+/* Cards, grids */
+.grid { display: grid; gap: 16px; }
+.grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.card { background: var(--surface); border-radius: var(--radius); padding: 20px 22px; }
+.card.teal { background: var(--teal-50); }
+.card.yellow { background: var(--yellow-100); }
+.card.dark { background: var(--green-700); color: #fff; }
+.card h3 { margin-bottom: .35em; }
+
+/* KPI */
+.kpi { background: #fff; border-radius: var(--radius); padding: 18px 20px; border: 1px solid var(--rule); }
+.kpi .label { font-size: 12px; color: var(--grey-700); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
+.kpi .value { font-size: 34px; font-weight: 700; line-height: 1.1; color: var(--green-900); margin-top: 4px; }
+.kpi .delta { font-size: 13px; color: var(--green-500); margin-top: 2px; }
+.kpi .delta.down { color: var(--yellow-700); }
+
+/* Buttons / chips */
+.btn { display: inline-block; background: var(--yellow-500); color: var(--green-900); font-weight: 600; padding: 12px 20px; border-radius: 8px; text-decoration: none; }
+.btn.secondary { background: transparent; border: 1.5px solid var(--green-900); }
+.chip { display: inline-block; background: var(--teal-100); color: var(--green-900); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.chip.yellow { background: var(--yellow-100); color: var(--yellow-900); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th { background: var(--green-900); color: #fff; text-align: left; font-weight: 600; padding: 10px 14px; }
+tbody td { padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+tbody tr:nth-child(even) td { background: var(--grey-100); }
+
+/* Sections */
+section { padding: 40px 0; }
+footer.site { padding: 28px 0 40px; color: var(--grey-700); font-size: 13px; border-top: 1px solid var(--rule); }
+
+@media (max-width: 640px) { .wrap { padding: 0 16px; } .hero { padding: 40px 0 48px; } }
+
+</style>
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --pg-bg: #fffae9; --pg-text: #002e2b; --pg-text-2: #20514e; --pg-muted: #4d4d4d;
+  --card: #f0f0f0; --card-teal: #e7f4f2; --card-yellow: #fff2cc; --card-yellow-text: #4d3400;
+  --rule-c: #e1e1e1; --tag-c: #808080; --accent-c: #9a6700;
+  --th-bg: #002e2b; --th-text: #ffffff; --band: #f0f0f0;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); background: var(--pg-bg); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --pg-bg: #002e2b; --pg-text: #ffffff; --pg-text-2: #b7ddd9; --pg-muted: #cfe9e6;
+    --card: #20514e; --card-teal: #477a75; --card-yellow: #4d3400; --card-yellow-text: #ffe699;
+    --rule-c: #20514e; --tag-c: #b7ddd9; --accent-c: #ffc000;
+    --th-bg: #20514e; --th-text: #ffffff; --band: #20514e;
+  }
+}
+:root[data-theme="dark"] {
+  --pg-bg: #002e2b; --pg-text: #ffffff; --pg-text-2: #b7ddd9; --pg-muted: #cfe9e6;
+  --card: #20514e; --card-teal: #477a75; --card-yellow: #4d3400; --card-yellow-text: #ffe699;
+  --rule-c: #20514e; --tag-c: #b7ddd9; --accent-c: #ffc000;
+  --th-bg: #20514e; --th-text: #ffffff; --band: #20514e;
+}
+body { background: var(--pg-bg); color: var(--pg-text); }
+h1, h2, h3 { color: var(--pg-text); }
+.lede { color: var(--pg-text-2); }
+.hero .lede { color: var(--teal-200); }
+.hero h1 { color: #fff; }
+.tag { color: var(--tag-c); }
+.hero .tag { color: var(--teal-200); }
+.card { background: var(--card); color: var(--pg-text); }
+.card.teal { background: var(--card-teal); }
+.card.yellow { background: var(--card-yellow); color: var(--card-yellow-text); }
+.card.yellow h3 { color: var(--card-yellow-text); }
+:root:not([data-theme="dark"]) .card.teal { color: var(--green-900); }
+.chip { background: var(--teal-100); color: var(--green-900); }
+.chip.yellow { background: var(--yellow-100); color: var(--yellow-900); border: 1px solid var(--yellow-500); }
+thead th { background: var(--th-bg); color: var(--th-text); }
+tbody td { border-bottom: 1px solid var(--rule-c); color: var(--pg-text); }
+tbody tr:nth-child(even) td { background: var(--band); }
+footer.site { color: var(--pg-muted); border-top: 1px solid var(--rule-c); }
+footer.site a, main a { color: var(--accent-c); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero { border-bottom: 1px solid #20514e; } }
+.hero { padding: 40px 0 56px; }
+.hero .logo svg { height: 40px; }
+.sec-lede { max-width: 720px; color: var(--pg-text-2); font-size: 18px; }
+
+.wrap { max-width: 1320px; }
+.stepper { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 24px; }
+.diagram-card { background: #ffffff; border: 1px solid #e1e1e1; border-radius: 12px; padding: 12px; overflow-x: auto; }
+.diagram-card svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.diagram-card svg text { font-family: 'Inter', Arial, Helvetica, sans-serif; }
+.th { font-weight: 600; font-size: 14px; }
+.ts { font-weight: 400; font-size: 12px; }
+.ph { font-weight: 500; font-size: 11px; letter-spacing: .12em; }
+.arr { stroke: #20514e; stroke-width: 1.5; fill: none; }
+.ret { stroke: #477a75; stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+.s { transition: opacity .35s ease; }
+.js .s.off { opacity: 0; visibility: hidden; }
+.js .s.past { opacity: .6; }
+.js .s.on { opacity: 1; }
+
+.panel { background: var(--card); border-radius: 12px; padding: 22px 24px; }
+.step-card h3 { font-size: 22px; margin: 4px 0 10px; }
+.step-card p { margin: 0 0 12px; }
+.step-card .label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; margin: 14px 0 6px; color: var(--tag-c); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.note { margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: var(--card-yellow); color: var(--card-yellow-text); font-size: 14px; }
+.js .step-card[hidden] { display: none; }
+.step-card + .step-card { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--rule-c); }
+.js .step-card + .step-card { margin-top: 0; padding-top: 0; border-top: 0; }
+.js.all .step-card + .step-card { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--rule-c); }
+
+.controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.controls button { font: inherit; font-weight: 600; font-size: 14px; cursor: pointer; border-radius: 8px; padding: 10px 16px; border: 1.5px solid var(--pg-text); background: transparent; color: var(--pg-text); }
+.controls button.primary { background: var(--yellow-500); border-color: var(--yellow-500); color: var(--green-900); }
+.controls button:disabled { opacity: .4; cursor: default; }
+.controls button:focus-visible, .dots button:focus-visible { outline: 3px solid var(--yellow-500); outline-offset: 2px; }
+.dots { display: flex; gap: 8px; margin-left: auto; }
+.dots button { width: 14px; height: 14px; padding: 0; border-radius: 50%; border: 1.5px solid var(--pg-text); background: transparent; cursor: pointer; }
+.dots button[aria-current="true"] { background: var(--yellow-500); border-color: var(--yellow-500); }
+.dots button.done { background: var(--pg-text-2); border-color: var(--pg-text-2); }
+.hint { font-size: 13px; color: var(--pg-muted); margin-top: 10px; }
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.head-row h2 { margin: 0; }
+.pill { font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; border-radius: 999px; padding: 10px 28px; background: var(--yellow-500); border: 1.5px solid var(--yellow-500); color: var(--green-900); }
+.pill:hover { background: var(--yellow-400); border-color: var(--yellow-400); }
+.pill:focus-visible { outline: 3px solid var(--yellow-500); outline-offset: 2px; }
+.diagram-card { position: relative; }
+.start-hint { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; color: #4d4d4d; font-size: 16px; padding: 0 24px; pointer-events: none; }
+.intro h3 { font-size: 22px; margin: 4px 0 10px; }
+.intro p { margin: 0 0 12px; }
+.no-js-hide { display: none; }
+.js .no-js-hide { display: inline-block; }
+
+details { background: var(--card); border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
+details summary { cursor: pointer; font-weight: 600; }
+details p { margin: 10px 0 0; }
+table th, table td { vertical-align: top; }
+.table-wrap { overflow-x: auto; }
+.table-wrap table { min-width: 640px; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
+
+@media (max-width: 1100px) { .stepper { grid-template-columns: minmax(0, 1fr); } .diagram-card { max-width: 900px; } }
+@media (prefers-reduced-motion: reduce) { .s { transition: none; } }
+@media print { .controls, .hint { display: none; } .js .step-card[hidden] { display: block; } .js .s.off, .js .s.past { opacity: 1; visibility: visible; } }
+</style>
+<style>
+.wrap { max-width: 1080px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+.filters button { font: inherit; font-size: 14px; font-weight: 600; border-radius: 999px; padding: 8px 16px; border: 1.5px solid var(--pg-text); background: transparent; color: var(--pg-text); cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--yellow-500); border-color: var(--yellow-500); color: var(--green-900); }
+.filters button:focus-visible { outline: 3px solid var(--yellow-500); outline-offset: 2px; }
+.faq-group { margin-top: 24px; }
+.faq-group[hidden] { display: none; }
+.faq-group h3 { font-size: 20px; margin: 0 0 12px; }
+.table-wrap table { min-width: 720px; }
+</style>
+<style>
+.wrap { max-width: 1320px; }
+.th { font-weight: 600; font-size: 14px; }
+.tb { font-weight: 600; font-size: 13px; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+.seg { display: inline-flex; border: 1.5px solid var(--pg-text); border-radius: 999px; overflow: hidden; }
+.seg button { font: inherit; font-weight: 600; font-size: 14px; padding: 8px 20px; border: 0; background: transparent; color: var(--pg-text); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--yellow-500); color: var(--green-900); }
+.seg button:focus-visible { outline: 3px solid var(--yellow-500); outline-offset: -3px; }
+.arch-card { background: #ffffff; border: 1px solid #e1e1e1; border-radius: 12px; padding: 12px; margin-top: 24px; }
+.arch-scroll { overflow-x: auto; }
+.arch-scroll svg { display: block; width: 100%; min-width: 980px; height: auto; }
+.arch-scroll svg text { font-family: 'Inter', Arial, Helvetica, sans-serif; }
+.comp { cursor: pointer; }
+.comp:hover rect { stroke-width: 2.5; }
+.comp:focus-visible { outline: none; }
+.comp:focus-visible rect, .comp.sel rect { stroke: #000000; stroke-width: 3; }
+svg[data-mode="hybrid"] .m-saas { display: none; }
+svg[data-mode="saas"] .m-hyb { display: none; }
+.a-data { stroke: #477a75; stroke-width: 3; fill: none; }
+.a-ctl { stroke: #20514e; stroke-width: 1.5; fill: none; }
+.a-ai { stroke: #9a6700; stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+.a-sec { stroke: #808080; stroke-width: 1.8; stroke-dasharray: 2 4; stroke-linecap: round; fill: none; }
+.detail { background: var(--card); border-radius: 12px; padding: 22px 24px; margin-top: 16px; }
+.detail h3 { font-size: 22px; margin: 0 0 8px; }
+.detail p { margin: 0 0 8px; }
+.head-ctl { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.tlsb, .tlsstrip { display: none; pointer-events: none; }
+svg.tls-on .tlsstrip { display: block; }
+svg[data-mode="hybrid"].tls-on .tlsstrip.m-saas, svg[data-mode="saas"].tls-on .tlsstrip.m-hyb { display: none; }
+svg.tls-on .tlsb { display: block; }
+svg[data-mode="hybrid"].tls-on .tlsb.m-saas, svg[data-mode="saas"].tls-on .tlsb.m-hyb { display: none; }
+svg.tls-on .comp { opacity: .7; }
+svg.tls-on .comp.sel { opacity: 1; }
+.pill[aria-pressed="true"] { background: var(--green-900); border-color: var(--green-900); color: #fff; }
+.grp { font-size: 22px; margin: 36px 0 4px; }
+.grp-lede { margin: 0 0 4px; color: var(--pg-text-2); }
+.seqd-card { margin-top: 20px; }
+.seqd-card[hidden] { display: none; }
+.seqd-card svg { min-width: 980px; }
+.seqd .chipr { stroke-width: 1; }
+.seqd.hl-on .sm { opacity: .3; }
+.seqd.hl-on .sm.hl { opacity: 1; }
+.seq li[tabindex] { cursor: default; }
+.seq li:hover, .seq li:focus-visible { outline: 2px solid var(--yellow-500); }
+.seq { list-style: none; counter-reset: step; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; }
+.seq[hidden] { display: none; }
+.seq li { counter-increment: step; position: relative; background: var(--card); border-radius: 12px; padding: 16px 20px 16px 64px; }
+.seq li::before { content: counter(step); position: absolute; left: 20px; top: 16px; width: 28px; height: 28px; border-radius: 50%; background: var(--yellow-500); color: var(--green-900); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.seq li p { margin: 4px 0 10px; }
+.d-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 12px; }
+.d-cols[hidden] { display: none; }
+.label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; margin: 0 0 6px; color: var(--tag-c); }
+@media (max-width: 760px) { .d-cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="hero on-dark">
+  <div class="wrap">
+    <div class="logo"><svg style="height:40px;width:auto" role="img" aria-label="Maia by Matillion" id="maia_by_matillion_on_dark_Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 518.27 246.95"><defs><style>.maia_by_matillion_on_dark_cls-1 {fill: url(#maia_by_matillion_on_dark_linear-gradient-5);}.maia_by_matillion_on_dark_cls-2 {fill: url(#maia_by_matillion_on_dark_linear-gradient-6);}.maia_by_matillion_on_dark_cls-3 {fill: url(#maia_by_matillion_on_dark_linear-gradient-4);}.maia_by_matillion_on_dark_cls-4 {fill: url(#maia_by_matillion_on_dark_linear-gradient-3);}.maia_by_matillion_on_dark_cls-5 {fill: url(#maia_by_matillion_on_dark_linear-gradient-2);}.maia_by_matillion_on_dark_cls-6 {fill: url(#maia_by_matillion_on_dark_linear-gradient);}.maia_by_matillion_on_dark_cls-7 {fill: #b7ddd9;}.maia_by_matillion_on_dark_cls-8 {fill: #fff;}</style><linearGradient id="maia_by_matillion_on_dark_linear-gradient" x1="101.07" y1="236.66" x2="172.31" y2="291.93" gradientTransform="translate(0 274.96) scale(1 -1)" gradientUnits="userSpaceOnUse"><stop offset=".33" stop-color="#fff"/><stop offset=".41" stop-color="#fff" stop-opacity=".98"/><stop offset=".5" stop-color="#fff" stop-opacity=".92"/><stop offset=".61" stop-color="#fff" stop-opacity=".83"/><stop offset=".72" stop-color="#fff" stop-opacity=".7"/><stop offset=".78" stop-color="#fff" stop-opacity=".6"/></linearGradient><linearGradient id="maia_by_matillion_on_dark_linear-gradient-2" x1="-17.46" y1="225.59" x2="69.13" y2="290.38" xlink:href="#maia_by_matillion_on_dark_linear-gradient"/><linearGradient id="maia_by_matillion_on_dark_linear-gradient-3" x1="86.54" y1="76.46" x2="167.89" y2="160.33" xlink:href="#maia_by_matillion_on_dark_linear-gradient"/><linearGradient id="maia_by_matillion_on_dark_linear-gradient-4" x1="17.15" y1="151.28" x2="77" y2="211.54" xlink:href="#maia_by_matillion_on_dark_linear-gradient"/><linearGradient id="maia_by_matillion_on_dark_linear-gradient-5" x1="65.81" y1="164.5" x2="117.23" y2="226.03" gradientTransform="translate(0 274.96) scale(1 -1)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset=".13" stop-color="#fff" stop-opacity=".98"/><stop offset=".28" stop-color="#fff" stop-opacity=".92"/><stop offset=".44" stop-color="#fff" stop-opacity=".83"/><stop offset=".61" stop-color="#fff" stop-opacity=".7"/><stop offset=".72" stop-color="#fff" stop-opacity=".6"/></linearGradient><linearGradient id="maia_by_matillion_on_dark_linear-gradient-6" x1="-45.54" y1="9155.52" x2="169.12" y2="8953.96" gradientTransform="translate(0 -8931.0601)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#a76227"/><stop offset=".09" stop-color="#be7822"/><stop offset=".22" stop-color="#d8911c"/><stop offset=".35" stop-color="#eba219"/><stop offset=".49" stop-color="#f6ad16"/><stop offset=".63" stop-color="#fab116"/><stop offset="1" stop-color="#ffecbe"/></linearGradient></defs><g><g><path class="maia_by_matillion_on_dark_cls-7" d="M218.17,228.17c-1.52,0-2.81-.28-3.81-.86-1.04-.58-1.87-1.29-2.51-2.15s-1.12-1.68-1.45-2.51h-.33v4.95h-2.99v-35.22h3.07v13.88h.25c.33-.79.83-1.62,1.44-2.44.63-.83,1.45-1.54,2.48-2.11s2.31-.86,3.88-.86c2.1,0,3.9.58,5.46,1.7,1.57,1.12,2.77,2.72,3.65,4.79s1.32,4.42,1.32,7.18-.45,5.13-1.32,7.2-2.1,3.65-3.65,4.8-3.38,1.7-5.46,1.7v-.08l-.02.02ZM217.79,225.26c1.68,0,3.07-.46,4.21-1.44,1.16-.96,2.01-2.26,2.61-3.9.61-1.65.91-3.47.91-5.5s-.3-3.81-.88-5.45-1.45-2.89-2.61-3.85-2.56-1.44-4.23-1.44-3.02.46-4.18,1.37-2.01,2.18-2.61,3.8c-.61,1.6-.91,3.47-.91,5.55s.3,3.96.91,5.58,1.49,2.91,2.64,3.85c1.16.94,2.53,1.4,4.14,1.4h0l-.02.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M232.23,237.13l.86-2.77.36.12c.91.28,1.7.36,2.44.25.74-.12,1.4-.5,2.01-1.16.58-.66,1.11-1.6,1.52-2.86l.99-2.89-9.76-26.63h3.35l5.86,16.61c.54,1.52,1.02,3.02,1.44,4.51s.83,2.94,1.24,4.39h-1.11c.45-1.44.88-2.91,1.29-4.39s.88-2.99,1.44-4.47l5.88-16.61h3.35l-11.28,30.73c-.5,1.32-1.07,2.39-1.73,3.24s-1.44,1.49-2.31,1.9-1.85.63-2.91.63c-.63,0-1.19-.05-1.7-.17s-.94-.25-1.24-.38l.03-.03h-.03Z"/></g><g><path class="maia_by_matillion_on_dark_cls-7" d="M325.36,195.2l-20.59-11.87c-2.66-1.54-5.96-1.54-8.63,0l-20.59,11.87c-2.66,1.54-4.31,4.39-4.31,7.48v23.77c0,3.07,1.65,5.94,4.31,7.48l20.59,11.87c2.66,1.54,5.96,1.54,8.63,0l20.59-11.87c2.66-1.54,4.31-4.39,4.31-7.48v-23.77c0-3.07-1.65-5.94-4.31-7.48ZM280.84,229.06c-.86,0-1.73-.3-2.44-.91-1.57-1.35-1.73-3.71-.38-5.28l19.65-22.68c1.35-1.57,3.71-1.73,5.25-.38,1.57,1.35,1.73,3.71.38,5.25l-19.65,22.68c-.74.86-1.78,1.29-2.82,1.29h0l.03.03h-.02ZM322.56,228.17c-.71.61-1.57.91-2.43.91-1.04,0-2.1-.45-2.82-1.29l-9.39-11-9.39,11c-.74.86-1.78,1.29-2.82,1.29-.86,0-1.73-.3-2.43-.91-1.57-1.35-1.77-3.68-.41-5.25l12.15-14.22s.05-.08.12-.12l.25-.25s.03-.03.05-.05c.08-.08.2-.17.3-.25h0s.12-.08.17-.12.12-.08.17-.12h0c.17-.08.36-.2.53-.25.05,0,.13-.05.2-.05s.08-.03.13-.05c.08,0,.17-.05.25-.05.05,0,.13,0,.2-.03h1.16s.13,0,.2.03c.05,0,.12,0,.2.05h.08s.08,0,.12.03c.05,0,.12.03.17.05h.05s.12.05.17.08c.25.12.5.25.71.41.05.03.08.08.13.12.05.05.12.08.17.13s.12.08.13.13c.05.05.08.12.13.17,0,0,.03.03.05.05l12.2,14.23c1.35,1.57,1.16,3.93-.41,5.25h0l-.03.03v.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.06,208.6h0s-.05.05-.12.08l.08-.08h.03Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.39,208.31s-.03.03-.05.05c0,0,.03-.03.05-.05Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.32,208.32l-.25.25.25-.25Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.65,208.06s-.2.17-.3.25c.03-.03.05-.05.08-.08.05-.05.13-.12.2-.17h.03-.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M306.02,207.81c.17-.12.36-.2.53-.25-.2.08-.36.17-.53.25Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M310.32,208.19l.12.12s-.12-.08-.17-.13l.03.03h.03l-.02-.02Z"/></g><g><path class="maia_by_matillion_on_dark_cls-7" d="M347.08,227.67v-26.53h4.79l.13,6.16h-.38c.36-1.52.94-2.74,1.68-3.71.78-.96,1.65-1.68,2.66-2.18,1.01-.5,2.1-.71,3.19-.71,1.87,0,3.35.61,4.51,1.78s1.9,2.86,2.31,5h-.63c.33-1.45.91-2.69,1.73-3.71s1.82-1.78,2.97-2.31,2.43-.79,3.73-.79c1.52,0,2.86.33,4.09,1.02,1.24.69,2.2,1.7,2.91,3.05s1.07,3.02,1.07,5.04v17.9h-5.04v-17.37c0-1.77-.46-3.05-1.44-3.85-.96-.79-2.06-1.19-3.38-1.19-1.04,0-1.95.21-2.72.69s-1.35,1.11-1.77,1.9c-.41.83-.61,1.77-.61,2.81v16.99h-4.95v-17.7c0-1.44-.45-2.56-1.32-3.4-.88-.86-1.98-1.29-3.35-1.29-.94,0-1.78.21-2.58.69-.79.45-1.44,1.12-1.93,2.01s-.71,1.95-.71,3.24v16.49h-5.04.03l.03-.03Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M394.61,228.28c-1.62,0-3.07-.3-4.38-.94-1.3-.64-2.34-1.54-3.1-2.74s-1.16-2.66-1.16-4.42c0-1.52.28-2.74.83-3.71.54-.96,1.32-1.73,2.26-2.31.96-.58,2.01-.99,3.15-1.29s2.34-.5,3.55-.63c1.52-.2,2.72-.33,3.68-.46s1.65-.33,2.1-.61.66-.71.66-1.35v-.13c0-.99-.2-1.85-.54-2.53s-.91-1.21-1.62-1.57-1.62-.54-2.69-.54-2.06.17-2.86.53-1.45.79-1.95,1.37c-.5.54-.86,1.12-1.11,1.73l-4.72-1.29c.58-1.6,1.4-2.86,2.48-3.81s2.31-1.68,3.71-2.11,2.86-.66,4.34-.66c1.04,0,2.11.13,3.3.38,1.16.25,2.26.71,3.27,1.37s1.85,1.6,2.48,2.81.96,2.77.96,4.71v17.62h-4.87v-3.63h-.25c-.33.69-.83,1.35-1.49,2.01s-1.49,1.19-2.48,1.6-2.2.63-3.57.63l.03.03-.03-.03ZM395.73,224.07c1.37,0,2.53-.28,3.52-.83.96-.54,1.73-1.29,2.23-2.2.53-.91.78-1.9.78-2.91v-3.38c-.2.2-.53.36-1.04.53s-1.11.28-1.77.41c-.66.12-1.29.21-1.9.3s-1.11.13-1.52.2c-.94.13-1.82.33-2.58.63s-1.4.71-1.87,1.29c-.46.54-.69,1.29-.69,2.2,0,.83.21,1.54.63,2.11s.99.99,1.7,1.29c.71.28,1.54.45,2.48.45l.03-.08Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M423.67,201.16v4.23h-13.82v-4.23h13.82ZM413.54,194.83h5.04v25.67c0,1.07.21,1.85.66,2.34s1.16.74,2.15.74c.25,0,.61-.03,1.02-.08s.79-.13,1.11-.2l.88,4.18c-.53.2-1.11.33-1.7.41s-1.21.13-1.82.13c-2.31,0-4.09-.63-5.38-1.87s-1.93-2.99-1.93-5.22v-26.12h-.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M429.96,197.08c-.88,0-1.62-.3-2.23-.91s-.94-1.35-.94-2.18.3-1.6.94-2.2c.61-.61,1.35-.91,2.23-.91s1.62.3,2.23.91.94,1.35.94,2.2-.3,1.6-.94,2.18-1.37.91-2.23.91ZM427.43,227.67v-26.53h5.04v26.53h-5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M443.11,192.32v35.35h-5.04v-35.35h5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M453.78,192.32v35.35h-5.04v-35.35h5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M461.92,197.08c-.88,0-1.62-.3-2.23-.91s-.94-1.35-.94-2.18.3-1.6.94-2.2c.61-.61,1.35-.91,2.23-.91s1.62.3,2.23.91.94,1.35.94,2.2-.3,1.6-.94,2.18-1.37.91-2.23.91ZM459.39,227.67v-26.53h5.04v26.53h-5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M480.61,228.23c-2.39,0-4.47-.58-6.27-1.7-1.78-1.16-3.19-2.74-4.18-4.79-.99-2.05-1.49-4.46-1.49-7.18s.5-5.17,1.49-7.23c.99-2.06,2.36-3.65,4.18-4.8,1.78-1.16,3.88-1.7,6.27-1.7s4.51.58,6.29,1.7c1.78,1.12,3.19,2.74,4.18,4.8s1.49,4.47,1.49,7.23-.5,5.12-1.49,7.18c-.99,2.06-2.39,3.65-4.18,4.79-1.78,1.14-3.88,1.7-6.29,1.7ZM480.61,223.82c1.54,0,2.82-.41,3.85-1.27s1.77-1.98,2.26-3.38.74-2.94.74-4.62-.25-3.24-.74-4.67-1.24-2.56-2.26-3.4c-1.02-.86-2.28-1.27-3.85-1.27s-2.81.41-3.81,1.27c-1.02.86-1.77,1.98-2.26,3.38s-.74,2.97-.74,4.67.25,3.22.74,4.62,1.24,2.53,2.26,3.38c1.02.86,2.28,1.27,3.81,1.27v.03-.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M501.94,211.99v15.72h-5.04v-26.53h4.79l.05,6.52h-.53c.74-2.36,1.82-4.09,3.24-5.2s3.14-1.65,5.13-1.65c1.73,0,3.24.38,4.54,1.12,1.29.78,2.31,1.87,3.02,3.35.74,1.49,1.11,3.32,1.11,5.53v16.86h-5.04v-16.21c0-1.93-.46-3.4-1.44-4.47-.96-1.07-2.28-1.62-3.96-1.62-1.12,0-2.15.25-3.02.78-.91.53-1.6,1.27-2.11,2.26s-.78,2.18-.78,3.57h0l.03-.02Z"/></g></g><g id="maia_by_matillion_on_dark_Layer_1-2" data-name="Layer 1"><g id="maia_by_matillion_on_dark_uuid-2b5aae4b-3a3c-4460-ab90-146e7e1a8611" data-name="Layer 1-2"><g><g><g><path class="maia_by_matillion_on_dark_cls-6" d="M131.53,13.19l-1.5,2.45c-.84,1.38-.39,3.17,1.01,3.98l2.25,1.29c1.35.78,3.07.34,3.87-.98l1.47-2.4,3.78.09c.93.02,1.78-.45,2.26-1.23l3.71-6.05c.48-.78.51-1.77.07-2.57l-3.39-6.25c-.43-.81-1.28-1.33-2.19-1.35L135.76,0c-.93-.02-1.78.45-2.26,1.23l-3.71,6.05c-.48.78-.51,1.77-.07,2.57l1.8,3.32h.01s-.01.01-.01.01Z"/><path class="maia_by_matillion_on_dark_cls-5" d="M27.84,16.54c.48.78,1.34,1.25,2.26,1.23l3.78-.09,1.41,2.3c.82,1.33,2.54,1.77,3.87.98l2.25-1.29c1.4-.81,1.85-2.61,1.01-3.98l-1.45-2.36,1.8-3.32c.43-.81.41-1.79-.07-2.57l-3.71-6.05c-.48-.78-1.34-1.25-2.26-1.23l-7.09.19c-.93.02-1.75.53-2.19,1.35l-3.39,6.25c-.43.81-.41,1.79.07,2.57l3.71,6.05v-.02h0Z"/></g><path class="maia_by_matillion_on_dark_cls-4" d="M130.58,125.52l-1.03-2.7c-4.81,14.85-16.49,26.53-31.34,31.34,14.85,4.8,26.58,16.58,31.34,31.34,4.75-14.75,16.56-26.59,31.34-31.34-13.84-4.56-25.18-14.95-30.33-28.65h.01s0,0,0,0Z"/><path class="maia_by_matillion_on_dark_cls-3" d="M50.45,74.31h0c4.98,0,9.01,4.04,9.01,9.02v13.65c0,4.98-4.04,9.02-9.01,9.02h0c-4.98,0-9.01-4.04-9.01-9.02v-13.65c0-4.98,4.04-9.02,9.01-9.02Z"/><path class="maia_by_matillion_on_dark_cls-1" d="M82.78,74.31h0c4.98,0,9.01,4.04,9.01,9.02v13.65c0,4.98-4.04,9.02-9.01,9.02h0c-4.98,0-9.01-4.04-9.01-9.02v-13.65c0-4.98,4.04-9.02,9.01-9.02Z"/><path class="maia_by_matillion_on_dark_cls-2" d="M155.42,44.79l-51.9-29.97c-10.62-6.12-23.79-6.12-34.41,0l-51.9,29.97C6.59,50.92,0,62.33,0,74.59v59.94c0,12.25,6.59,23.67,17.21,29.8l51.9,29.97c5.31,3.06,11.26,4.6,17.21,4.6s11.89-1.53,17.21-4.6l9.26-5.34s-.02-.01-.04-.02c3.79-2.5,5.03-7.55,2.74-11.53l-.93-1.59h0c-3.37-4.91-8.04-8.83-13.53-11.29-4.36-1.95-9.4-1.67-13.53.71h0c-5.48,3.17-12.25,3.17-17.74,0l-42.35-24.46c-5.48-3.17-8.86-9.03-8.86-15.36v-48.9c0-6.34,3.38-12.19,8.86-15.36l42.35-24.44c5.48-3.17,12.25-3.17,17.74,0l42.35,24.44c5.48,3.17,8.86,9.03,8.86,15.36v39.4c0,15.62,12.77,28.39,28.39,28.39h.64c2.7,0,4.91-2.1,4.91-4.66h0v-65.06c0-12.25-6.59-23.67-17.21-29.8h0Z"/></g><path class="maia_by_matillion_on_dark_cls-8" d="M271.76,112.6c-.68,1.93-1.47,4.42-2.35,7.47s-1.79,6.3-2.72,9.75c-.93,3.46-1.81,6.85-2.65,10.18-.14.57-.27,1.11-.41,1.63-.16-.63-.31-1.25-.47-1.91-.83-3.35-1.7-6.75-2.65-10.22-.93-3.46-1.83-6.66-2.68-9.61s-1.63-5.38-2.31-7.32l-23.83-65.17h-24.64v113.58h16.27v-61.13c0-2.49-.04-5.4-.11-8.73s-.14-6.85-.23-10.56c-.07-3.71-.14-7.38-.23-11.02-.04-1.63-.07-3.17-.11-4.69.63,2.12,1.27,4.24,1.9,6.36,1.18,3.94,2.32,7.73,3.45,11.35,1.13,3.64,2.17,6.93,3.12,9.9.95,2.97,1.8,5.43,2.52,7.36l22.65,61.13h14.29l22.36-61.13c.68-1.98,1.53-4.48,2.52-7.52,1-3.02,2.05-6.36,3.15-10.03,1.11-3.66,2.22-7.45,3.38-11.4.65-2.24,1.27-4.42,1.86-6.59-.04,1.88-.07,3.81-.11,5.78-.07,3.71-.14,7.38-.23,11.02-.07,3.64-.13,7.07-.18,10.33-.05,3.24-.07,6.05-.07,8.39v61.13h16.63V47.43h-24.78l-23.46,65.17h.06s.01,0,.01,0ZM391.62,80.35c-3.27-2.13-6.77-3.6-10.49-4.42-3.72-.82-7.23-1.22-10.56-1.22-4.78,0-9.43.71-13.93,2.13s-8.49,3.69-11.94,6.79c-3.47,3.1-6.14,7.19-7.99,12.28l15.18,4.11c.78-1.93,1.97-3.78,3.56-5.57,1.59-1.78,3.66-3.24,6.23-4.39,2.57-1.15,5.63-1.72,9.2-1.72s6.36.59,8.68,1.79c2.32,1.2,4.06,2.88,5.24,5.07,1.18,2.18,1.77,4.88,1.77,8.08v.46c0,1.98-.72,3.42-2.17,4.3-1.45.89-3.67,1.53-6.71,1.91-3.03.38-6.97.88-11.8,1.48-3.86.46-7.67,1.15-11.4,2.06-3.74.91-7.13,2.29-10.19,4.11-3.06,1.83-5.48,4.29-7.25,7.39-1.79,3.1-2.68,7.06-2.68,11.89,0,5.59,1.22,10.32,3.66,14.18,2.44,3.86,5.77,6.8,9.97,8.81,4.21,2,8.9,3.01,14.08,3.01,4.44,0,8.27-.68,11.47-2.02,3.2-1.35,5.85-3.06,7.95-5.14,2.1-2.08,3.69-4.22,4.76-6.4h.81v11.66h15.62v-56.56c0-6.2-1.03-11.23-3.08-15.09-2.05-3.86-4.71-6.86-7.99-8.99h.01s-.01,0-.01,0ZM386.63,130.29c0,3.31-.83,6.43-2.49,9.38-1.66,2.95-4.05,5.31-7.18,7.09s-6.89,2.67-11.29,2.67c-3.03,0-5.7-.46-7.99-1.38-2.3-.91-4.12-2.29-5.46-4.11-1.35-1.83-2.02-4.09-2.02-6.78,0-2.95.75-5.31,2.24-7.09s3.49-3.15,6.01-4.11c2.51-.96,5.28-1.65,8.32-2.06,1.27-.16,2.88-.36,4.83-.61,1.95-.25,3.98-.57,6.09-.95,2.1-.38,3.97-.82,5.6-1.29,1.63-.48,2.75-1.03,3.33-1.63v10.9h0s0-.01,0-.01ZM420.64,161h16.13v-85.22h-16.13v85.22ZM428.77,42.86c-2.79,0-5.17.96-7.14,2.89-1.98,1.93-2.97,4.29-2.97,7.09s1,5.03,2.97,6.98c1.98,1.95,4.36,2.94,7.14,2.94s5.18-.96,7.18-2.89c2-1.93,3.01-4.26,3.01-7.02s-1.01-5.16-3.01-7.09c-2-1.93-4.4-2.89-7.18-2.89h0ZM515.2,89.34c-2.05-3.86-4.71-6.86-7.99-8.99-3.27-2.13-6.77-3.6-10.49-4.42-3.72-.82-7.24-1.22-10.56-1.22-4.78,0-9.43.71-13.93,2.13s-8.49,3.69-11.94,6.79c-3.47,3.1-6.14,7.19-7.99,12.28l15.18,4.11c.78-1.93,1.97-3.78,3.56-5.57,1.59-1.78,3.66-3.24,6.23-4.39,2.57-1.15,5.63-1.72,9.2-1.72s6.36.59,8.68,1.79c2.32,1.2,4.06,2.88,5.24,5.07,1.18,2.18,1.75,4.88,1.75,8.08v.46c0,1.98-.72,3.42-2.17,4.3-1.45.89-3.67,1.53-6.71,1.91-3.03.38-6.97.88-11.8,1.48-3.86.46-7.67,1.15-11.4,2.06-3.74.91-7.13,2.29-10.19,4.11-3.06,1.83-5.48,4.29-7.25,7.39-1.79,3.1-2.68,7.06-2.68,11.89,0,5.59,1.22,10.32,3.66,14.18,2.44,3.86,5.77,6.8,9.97,8.81,4.21,2,8.9,3.01,14.08,3.01,4.44,0,8.27-.68,11.47-2.02,3.2-1.35,5.85-3.06,7.95-5.14,2.1-2.08,3.69-4.22,4.76-6.4h.81v11.66h15.62v-56.56c0-6.2-1.03-11.23-3.08-15.09h.02s0,0,0,0ZM502.21,130.29c0,3.31-.83,6.43-2.49,9.38-1.66,2.95-4.05,5.31-7.18,7.09s-6.89,2.67-11.29,2.67c-3.03,0-5.7-.46-7.99-1.38-2.3-.91-4.12-2.29-5.46-4.11-1.35-1.83-2.02-4.09-2.02-6.78,0-2.95.75-5.31,2.24-7.09s3.49-3.15,6.01-4.11c2.51-.96,5.28-1.65,8.32-2.06,1.27-.16,2.88-.36,4.83-.61,1.95-.25,3.98-.57,6.09-.95,2.1-.38,3.97-.82,5.6-1.29,1.63-.48,2.75-1.03,3.33-1.63v10.9h0s0-.01,0-.01Z"/></g></g></g></svg></div>
+    <p class="tag" style="margin:32px 0 12px">Maia architecture</p>
+    <h1 class="display"><span class="serif">See how Maia fits together.</span><span class="bold">Components, data flows and controls.</span></h1>
+    <p class="lede" style="margin-top:20px;max-width:680px">An interactive architecture for Hybrid SaaS and Full SaaS, showing what runs where, which data goes where, and the controls you have at each point.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <p class="tag">Interactive architecture</p>
+    <div class="head-row"><h2>What runs where, and what flows between</h2>
+      <div class="head-ctl">
+      <div class="seg no-js-hide" id="mode" role="group" aria-label="Deployment model">
+        <button type="button" data-mode="hybrid" aria-pressed="true">Hybrid SaaS</button>
+        <button type="button" data-mode="saas" aria-pressed="false">Full SaaS</button>
+      </div>
+      <button type="button" class="pill no-js-hide" id="tls" aria-pressed="false">Show TLS</button>
+      </div>
+    </div>
+    <p class="sec-lede">Switch between deployment models, then select any component to see what it does, what data it handles and the controls you have.</p>
+    <div class="arch-card"><div class="arch-scroll"><svg id="arch" data-mode="hybrid" viewBox="0 0 1240 700" role="group" aria-label="Maia architecture diagram"><title>Maia architecture</title><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><g class="comp " data-id="users" tabindex="0" role="button" aria-label="Your users"><rect x="20" y="20" width="360" height="70" rx="8" fill="#f0f0f0" stroke="#d1d1d1" stroke-width="1"/><text class="tb" x="200.0" y="46.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Your users</text><text class="ts" x="200.0" y="64.0" text-anchor="middle" dominant-baseline="central" fill="#4d4d4d">Sign in with SSO and MFA, work in Designer</text></g>
+<g class=""><rect x="20" y="110" width="360" height="490" rx="12" fill="#f3faf9" stroke="#477a75" stroke-width="1.2" stroke-dasharray="6 4"/><text class="ph" x="36" y="128" fill="#4d4d4d" dominant-baseline="central">YOUR CLOUD</text></g>
+<g class=""><rect x="410" y="110" width="530" height="490" rx="12" fill="#fffbe8" stroke="#ffc000" stroke-width="1.2" stroke-dasharray="6 4"/><text class="ph" x="426" y="128" fill="#4d4d4d" dominant-baseline="central">MATILLION-OPERATED MAIA · REGION YOU CHOOSE</text></g>
+<g class=""><rect x="980" y="110" width="240" height="280" rx="12" fill="#f5f5f5" stroke="#808080" stroke-width="1.2" stroke-dasharray="6 4"/><text class="ph" x="996" y="128" fill="#4d4d4d" dominant-baseline="central">MATILLION’S AWS ACCOUNT</text></g>
+<g class=""><rect x="980" y="410" width="240" height="150" rx="12" fill="#fafafa" stroke="#b3b3b3" stroke-width="1.2" stroke-dasharray="6 4"/><text class="ph" x="996" y="428" fill="#4d4d4d" dominant-baseline="central">OPTIONAL · YOUR AI PROVIDER</text></g>
+<rect x="36" y="146" width="328" height="98" rx="10" fill="none" stroke="#477a75" stroke-width="1"/>
+<g class="comp " data-id="sources" tabindex="0" role="button" aria-label="Sources"><rect x="40" y="150" width="155" height="90" rx="8" fill="#f0f0f0" stroke="#d1d1d1" stroke-width="1"/><text class="tb" x="117.5" y="186.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Sources</text><text class="ts" x="117.5" y="204.0" text-anchor="middle" dominant-baseline="central" fill="#4d4d4d">Databases, SaaS, files</text></g>
+<g class="comp " data-id="warehouse" tabindex="0" role="button" aria-label="Data warehouse"><rect x="205" y="150" width="155" height="90" rx="8" fill="#f0f0f0" stroke="#d1d1d1" stroke-width="1"/><text class="tb" x="282.5" y="186.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Data warehouse</text><text class="ts" x="282.5" y="204.0" text-anchor="middle" dominant-baseline="central" fill="#4d4d4d">Your cloud platform</text></g>
+<g class="comp m-hyb" data-id="runner-hybrid" tabindex="0" role="button" aria-label="Hybrid SaaS runner"><rect x="40" y="300" width="320" height="100" rx="8" fill="#002e2b" stroke="#002e2b" stroke-width="1"/><text class="tb" x="200.0" y="341.0" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Hybrid SaaS runner</text><text class="ts" x="200.0" y="359.0" text-anchor="middle" dominant-baseline="central" fill="#b7ddd9">In your VPC or VNet, runs pipelines</text></g>
+<g class="comp m-hyb" data-id="secrets-customer" tabindex="0" role="button" aria-label="Secret manager"><rect x="40" y="450" width="155" height="70" rx="8" fill="#20514e" stroke="#002e2b" stroke-width="1"/><text class="tb" x="117.5" y="476.0" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Secret manager</text><text class="ts" x="117.5" y="494.0" text-anchor="middle" dominant-baseline="central" fill="#b7ddd9">Holds secret values</text></g>
+<g class="comp m-hyb" data-id="git-customer" tabindex="0" role="button" aria-label="Your Git repo"><rect x="205" y="450" width="155" height="70" rx="8" fill="#477a75" stroke="#20514e" stroke-width="1"/><text class="tb" x="282.5" y="476.0" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Your Git repo</text><text class="ts" x="282.5" y="494.0" text-anchor="middle" dominant-baseline="central" fill="#e7f4f2">Optional, Hybrid SaaS</text></g>
+<g class="m-saas"><text class="ts" x="200" y="322" text-anchor="middle" fill="#20514e">Your data stays in your sources and</text><text class="ts" x="200" y="340" text-anchor="middle" fill="#20514e">warehouse. Matillion’s hosted runner</text><text class="ts" x="200" y="358" text-anchor="middle" fill="#20514e">connects to them to run pipelines.</text></g>
+<g class="comp " data-id="designer" tabindex="0" role="button" aria-label="Designer"><rect x="430" y="150" width="235" height="56" rx="8" fill="#20514e" stroke="#002e2b" stroke-width="1"/><text class="tb" x="547.5" y="169.0" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Designer</text><text class="ts" x="547.5" y="187.0" text-anchor="middle" dominant-baseline="central" fill="#b7ddd9">Build and review pipelines</text></g>
+<g class="comp " data-id="mission-control" tabindex="0" role="button" aria-label="Mission Control"><rect x="685" y="150" width="235" height="56" rx="8" fill="#20514e" stroke="#002e2b" stroke-width="1"/><text class="tb" x="802.5" y="169.0" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Mission Control</text><text class="ts" x="802.5" y="187.0" text-anchor="middle" dominant-baseline="central" fill="#b7ddd9">Assign and track tasks</text></g>
+<g class="comp " data-id="context-engine" tabindex="0" role="button" aria-label="Context Engine"><rect x="430" y="236" width="140" height="64" rx="8" fill="#ffc000" stroke="#9a6700" stroke-width="1"/><text class="tb" x="500.0" y="259.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Context Engine</text><text class="ts" x="500.0" y="277.0" text-anchor="middle" dominant-baseline="central" fill="#4d3400">Knowledge graph</text></g>
+<g class="comp " data-id="maia-team" tabindex="0" role="button" aria-label="Maia Team"><rect x="590" y="236" width="330" height="64" rx="8" fill="#ffc000" stroke="#9a6700" stroke-width="1"/><text class="tb" x="755.0" y="259.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Maia Team</text><text class="ts" x="755.0" y="277.0" text-anchor="middle" dominant-baseline="central" fill="#4d3400">Plans, builds and explains pipelines</text></g>
+<g class="comp " data-id="component-info" tabindex="0" role="button" aria-label="Component info"><rect x="430" y="330" width="150" height="38" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="505.0" y="350.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Component info</text></g>
+<g class="comp " data-id="api-gateway" tabindex="0" role="button" aria-label="API gateway"><rect x="600" y="330" width="150" height="38" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="675.0" y="350.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">API gateway</text></g>
+<g class="comp " data-id="audit" tabindex="0" role="button" aria-label="Audit service"><rect x="770" y="330" width="150" height="38" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="845.0" y="350.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Audit service</text></g>
+<g class="comp " data-id="runner-gateway" tabindex="0" role="button" aria-label="Runner gateway"><rect x="430" y="376" width="150" height="38" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="505.0" y="396.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Runner gateway</text></g>
+<g class="comp " data-id="scheduler" tabindex="0" role="button" aria-label="Scheduler"><rect x="600" y="376" width="150" height="38" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="675.0" y="396.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Scheduler</text></g>
+<g class="comp " data-id="workflow" tabindex="0" role="button" aria-label="Workflow execution"><rect x="770" y="376" width="150" height="38" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="845.0" y="396.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Workflow execution</text></g>
+<g class="comp m-saas" data-id="runner-saas" tabindex="0" role="button" aria-label="Matillion-hosted runner"><rect x="430" y="430" width="235" height="64" rx="8" fill="#002e2b" stroke="#002e2b" stroke-width="1"/><text class="tb" x="547.5" y="453.0" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Matillion-hosted runner</text><text class="ts" x="547.5" y="471.0" text-anchor="middle" dominant-baseline="central" fill="#b7ddd9">Runs pipelines and connectors</text></g>
+<g class="comp m-saas" data-id="vault-hosted" tabindex="0" role="button" aria-label="Hosted vault"><rect x="685" y="430" width="235" height="64" rx="8" fill="#20514e" stroke="#002e2b" stroke-width="1"/><text class="tb" x="802.5" y="453.0" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Hosted vault</text><text class="ts" x="802.5" y="471.0" text-anchor="middle" dominant-baseline="central" fill="#b7ddd9">Secrets for Full SaaS</text></g>
+<g class="m-hyb"><rect x="430" y="430" width="490" height="64" rx="8" fill="none" stroke="#9a6700" stroke-width="1" stroke-dasharray="5 4"/><text class="tb" x="675" y="453" text-anchor="middle" fill="#4d3400" dominant-baseline="central">Runner and secrets stay in your cloud</text><text class="ts" x="675" y="473" text-anchor="middle" fill="#4d3400" dominant-baseline="central">Hybrid SaaS never stores your passwords or keys</text></g>
+<g class="comp " data-id="project-git" tabindex="0" role="button" aria-label="Project metadata and Git"><rect x="430" y="510" width="235" height="56" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="547.5" y="529.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Project metadata and Git</text><text class="ts" x="547.5" y="547.0" text-anchor="middle" dominant-baseline="central" fill="#4d4d4d">Pipelines and project config</text></g>
+<g class="comp " data-id="history" tabindex="0" role="button" aria-label="Conversation history"><rect x="685" y="510" width="235" height="56" rx="8" fill="#e7f4f2" stroke="#b7ddd9" stroke-width="1"/><text class="tb" x="802.5" y="529.0" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Conversation history</text><text class="ts" x="802.5" y="547.0" text-anchor="middle" dominant-baseline="central" fill="#4d4d4d">Kept two years, per user</text></g>
+<g class="comp " data-id="bedrock" tabindex="0" role="button" aria-label="Amazon Bedrock"><rect x="1000" y="236" width="200" height="64" rx="8" fill="#fff2cc" stroke="#ffc000" stroke-width="1"/><text class="tb" x="1100.0" y="259.0" text-anchor="middle" dominant-baseline="central" fill="#4d3400">Amazon Bedrock</text><text class="ts" x="1100.0" y="277.0" text-anchor="middle" dominant-baseline="central" fill="#4d3400">Inference only</text></g>
+<text class="ts " x="1100" y="326" text-anchor="middle" fill="#4d4d4d" dominant-baseline="central">Never used for training</text>
+<text class="ts " x="1100" y="344" text-anchor="middle" fill="#4d4d4d" dominant-baseline="central">Nothing retained by provider</text>
+<text class="ts " x="1100" y="362" text-anchor="middle" fill="#4d4d4d" dominant-baseline="central">No open web access</text>
+<g class="comp " data-id="third-party" tabindex="0" role="button" aria-label="Third-party AI services"><rect x="1000" y="450" width="200" height="84" rx="8" fill="#f0f0f0" stroke="#b3b3b3" stroke-width="1"/><text class="tb" x="1100.0" y="468" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Third-party AI services</text><text class="ts" x="1100.0" y="486" text-anchor="middle" dominant-baseline="central" fill="#4d4d4d">Bedrock, OpenAI, Azure OpenAI</text><text class="ts" x="1100.0" y="502" text-anchor="middle" dominant-baseline="central" fill="#4d4d4d">Only if you add AI components</text></g>
+<path class="a-ctl " d="M380 55 H398 V178 H428" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<path class="a-ctl " d="M547 206 V234" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<path class="a-ctl " d="M802 206 V234" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<path class="a-ctl " d="M570 268 H588" marker-end="url(#ah)"/>
+<path class="a-ai " d="M922 268 H998" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<path class="a-ctl " d="M598 395 H582" marker-end="url(#ah)"/>
+<path class="a-data m-hyb" d="M117 244 V298" marker-end="url(#ah)"/>
+<path class="a-data m-hyb" d="M282 300 V246" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<text class="ts m-hyb" x="136" y="262" text-anchor="start" fill="#4d4d4d" dominant-baseline="central">Reads data</text>
+<text class="ts m-hyb" x="264" y="284" text-anchor="end" fill="#4d4d4d" dominant-baseline="central">Loads and queries</text>
+<path class="a-sec m-hyb" d="M117 400 V448" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<text class="ts m-hyb" x="125" y="424" text-anchor="start" fill="#4d4d4d" dominant-baseline="central">Resolves secrets</text>
+<path class="a-ctl m-hyb" d="M362 395 H428" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<text class="ts m-hyb" x="395" y="371" text-anchor="middle" fill="#4d4d4d" dominant-baseline="central">Outbound</text>
+<path class="a-ctl m-hyb" d="M360 485 H395 V538 H428" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<path class="a-data m-saas" d="M430 462 H388 V195 H366" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<path class="a-ctl m-saas" d="M495 428 V416" marker-end="url(#ah)"/>
+<path class="a-ctl m-saas" d="M515 416 V428" marker-end="url(#ah)"/>
+<path class="a-sec m-saas" d="M667 462 H683" marker-end="url(#ah)"/>
+<g class="tlsb "><circle cx="398" cy="120" r="12" fill="#002e2b" stroke="#ffffff" stroke-width="2"/><text x="398" y="121" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">1</text></g>
+<g class="tlsb "><circle cx="960" cy="268" r="12" fill="#002e2b" stroke="#ffffff" stroke-width="2"/><text x="960" y="269" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">5</text></g>
+<g class="tlsb m-hyb"><circle cx="395" cy="395" r="12" fill="#002e2b" stroke="#ffffff" stroke-width="2"/><text x="395" y="396" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">2</text></g>
+<g class="tlsb m-hyb"><circle cx="117" cy="271" r="12" fill="#002e2b" stroke="#ffffff" stroke-width="2"/><text x="117" y="272" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">3</text></g>
+<g class="tlsb m-hyb"><circle cx="282" cy="271" r="12" fill="#002e2b" stroke="#ffffff" stroke-width="2"/><text x="282" y="272" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">3</text></g>
+<g class="tlsb m-saas"><circle cx="388" cy="330" r="12" fill="#002e2b" stroke="#ffffff" stroke-width="2"/><text x="388" y="331" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">3</text></g>
+<g class="tlsb m-hyb"><circle cx="395" cy="512" r="12" fill="#002e2b" stroke="#ffffff" stroke-width="2"/><text x="395" y="513" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">4</text></g>
+<g class="tlsb"><rect x="601" y="501" width="58" height="20" rx="10" fill="#ffc000" stroke="#9a6700" stroke-width="1"/><text x="630" y="512" text-anchor="middle" dominant-baseline="central" fill="#002e2b" font-size="11" font-weight="700">At rest</text></g>
+<g class="tlsb"><rect x="856" y="501" width="58" height="20" rx="10" fill="#ffc000" stroke="#9a6700" stroke-width="1"/><text x="885" y="512" text-anchor="middle" dominant-baseline="central" fill="#002e2b" font-size="11" font-weight="700">At rest</text></g>
+<g class="legend" transform="translate(0,628)"><rect x="20" y="0" width="1200" height="56" rx="10" fill="#f7f7f7" stroke="#e1e1e1"/><path class="a-data" d="M44 28 H96"/><text class="ts" x="106" y="28" dominant-baseline="central" fill="#002e2b">Customer data path</text><path class="a-ctl" d="M290 28 H342"/><text class="ts" x="352" y="28" dominant-baseline="central" fill="#002e2b">Control and metadata</text><path class="a-ai" d="M560 28 H612"/><text class="ts" x="622" y="28" dominant-baseline="central" fill="#002e2b">AI prompts and context</text><path class="a-sec" d="M820 28 H872"/><text class="ts" x="882" y="28" dominant-baseline="central" fill="#002e2b">Secret references</text><path class="a-ctl" d="M1030 28 H1082" marker-start="url(#ah)" marker-end="url(#ah)"/><text class="ts" x="1092" y="28" dominant-baseline="central" fill="#002e2b">Two-way traffic</text></g>
+<g class="tlsstrip"><rect x="20" y="696" width="1200" height="56" rx="10" fill="#f7f7f7" stroke="#e1e1e1"/></g>
+<g class="tlsstrip "><circle cx="46" cy="724" r="11" fill="#002e2b"/><text x="46" y="725" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">1</text><text class="ts" x="66" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Browser to Maia</text><text class="ts" x="66" y="734" dominant-baseline="central" fill="#4d4d4d">TLS 1.2 or 1.3</text></g>
+<g class="tlsstrip m-hyb"><circle cx="246" cy="724" r="11" fill="#002e2b"/><text x="246" y="725" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">2</text><text class="ts" x="266" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Runner to Matillion</text><text class="ts" x="266" y="734" dominant-baseline="central" fill="#4d4d4d">TLS 1.2+, port 443</text></g>
+<g class="tlsstrip m-saas"><circle cx="246" cy="724" r="11" fill="#002e2b"/><text x="246" y="725" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">2</text><text class="ts" x="266" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Runner to Matillion</text><text class="ts" x="266" y="734" dominant-baseline="central" fill="#4d4d4d">Managed by Matillion</text></g>
+<g class="tlsstrip "><circle cx="446" cy="724" r="11" fill="#002e2b"/><text x="446" y="725" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">3</text><text class="ts" x="466" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Runner to sources</text><text class="ts" x="466" y="734" dominant-baseline="central" fill="#4d4d4d">Per source settings</text></g>
+<g class="tlsstrip m-hyb"><circle cx="646" cy="724" r="11" fill="#002e2b"/><text x="646" y="725" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">4</text><text class="ts" x="666" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Git to Maia</text><text class="ts" x="666" y="734" dominant-baseline="central" fill="#4d4d4d">HTTPS</text></g>
+<g class="tlsstrip m-saas"><circle cx="646" cy="724" r="11" fill="#002e2b"/><text x="646" y="725" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">4</text><text class="ts" x="666" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Git to Maia</text><text class="ts" x="666" y="734" dominant-baseline="central" fill="#4d4d4d">Maia-hosted Git</text></g>
+<g class="tlsstrip "><circle cx="846" cy="724" r="11" fill="#002e2b"/><text x="846" y="725" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="12" font-weight="700">5</text><text class="ts" x="866" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Maia to Bedrock</text><text class="ts" x="866" y="734" dominant-baseline="central" fill="#4d4d4d">TLS 1.2+</text></g>
+<g class="tlsstrip "><rect x="1028" y="714" width="36" height="20" rx="10" fill="#ffc000" stroke="#9a6700"/><text x="1046" y="725" text-anchor="middle" dominant-baseline="central" fill="#002e2b" font-size="10" font-weight="700">Rest</text><text class="ts" x="1066" y="716" dominant-baseline="central" fill="#002e2b" font-weight="600">Stored data</text><text class="ts" x="1066" y="734" dominant-baseline="central" fill="#4d4d4d">AWS KMS</text></g></svg></div></div>
+    <p class="hint" id="tls-key" hidden>Numbered badges mark TLS-protected connections, explained below. “At rest” marks encrypted storage.</p>
+    <div class="detail" id="detail" aria-live="polite">
+      <h3 id="d-title">Select a component</h3>
+      <p id="d-what">Choose any box in the diagram. In Hybrid SaaS, the runner and your secrets stay in your own cloud. In Full SaaS, Matillion hosts the runner and a vault for you.</p>
+      <div class="d-cols" id="d-cols" hidden>
+        <div><p class="label">Data it handles</p><p id="d-data"></p></div>
+        <div><p class="label">Your controls</p><p id="d-ctl"></p></div>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <p class="tag">Encryption in transit</p>
+    <h2>TLS, hop by hop</h2>
+    <p class="sec-lede">Maia supports TLS 1.2 and 1.3 and validates server certificates. The numbers match the badges on the diagram when you choose Show TLS. Arrowheads at both ends mean traffic flows both ways, and the runner always opens its own connection, so nothing needs to be opened inbound in Hybrid SaaS.</p>
+    <div class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>#</th><th>Connection</th><th>Direction</th><th>Protection</th><th>Good to know</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Your browser to Maia</td><td>Two-way: you send requests, Maia sends responses</td><td>TLS 1.2 or 1.3, with server certificate validation</td><td>Certificate validation confirms the server is genuine, which protects against man-in-the-middle attacks.</td></tr>
+          <tr><td>2</td><td>Hybrid SaaS runner to Matillion’s control plane</td><td>Two-way once connected, and always opened by the runner</td><td>TLS 1.2 or higher, with encrypted websocket connections</td><td>The runner connects outbound only, on port 443, so nothing needs to be opened inbound. Certificate pinning isn’t required. AWS PrivateLink is an option to keep this traffic off the public internet. With Full SaaS, Matillion manages this connection.</td></tr>
+          <tr><td>3</td><td>Runner to your sources and warehouse</td><td>Two-way: queries and loads go out, data and results come back</td><td>The security settings of each source or warehouse</td><td>For example, Snowflake uses port 443, plus port 80 for OCSP certificate checks. With Full SaaS, AWS PrivateLink can connect the hosted runner to Snowflake or AWS-hosted sources.</td></tr>
+          <tr><td>4</td><td>Your Git repository and Maia</td><td>Two-way: pushes and pulls</td><td>HTTPS, with encryption in transit</td><td>Applies when you use customer-hosted Git with Hybrid SaaS.</td></tr>
+          <tr><td>5</td><td>Matillion’s control plane to Amazon Bedrock</td><td>Two-way: prompt and context out, reply back</td><td>TLS 1.2 at minimum</td><td>Carries prompts and context only, never secret values.</td></tr>
+          <tr><td>At rest</td><td>Conversation history and platform data</td><td>Not applicable: stored data</td><td>AWS KMS, with its own key for conversation history</td><td>Keys are rotated annually. Your warehouse data at rest is protected by your cloud provider and your own settings.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:40px">How the layers work together</h3>
+    <p class="sec-lede">No single control carries the load. Each layer covers something the others don’t.</p>
+    <div class="grid cols-3" style="margin-top:20px">
+      <div class="card teal"><h3>Encryption</h3><p>TLS 1.2 and 1.3 protect data moving between components, and encryption protects stored data.</p></div>
+      <div class="card"><h3>Server identity</h3><p>Certificate validation checks who is on the other end of each connection.</p></div>
+      <div class="card"><h3>Network path</h3><p>Runners call out on port 443 only, and PrivateLink can keep traffic off the public internet.</p></div>
+      <div class="card"><h3>Secrets</h3><p>Only the runner can turn a secret reference into a value, and AI features never receive one.</p></div>
+      <div class="card"><h3>Access</h3><p>Single sign-on, MFA and roles decide who can start each request, and Maia can’t exceed the user’s access.</p></div>
+      <div class="card yellow"><h3>Audit</h3><p>The audit service records who did what and when, so every request leaves a trail.</p></div>
+    </div>
+
+    <div class="head-row" style="margin-top:40px"><h3 style="margin:0">Follow a request through the layers</h3>
+      <div class="seg no-js-hide" id="seqmode" role="group" aria-label="Choose a request">
+        <button type="button" data-seq="prompt" aria-pressed="true">A Maia Team prompt</button>
+        <button type="button" data-seq="run" aria-pressed="false">A pipeline run</button>
+      </div>
+    </div>
+    <div class="arch-card seqd-card" id="seqd-prompt"><div class="arch-scroll"><svg class="seqd" id="svg-prompt" viewBox="0 0 1200 650" role="img" aria-label="Request walkthrough: prompt">
+<defs><marker id="ah-prompt" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<line x1="110" y1="60" x2="110" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="330" y1="60" x2="330" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="590" y1="60" x2="590" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="850" y1="60" x2="850" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="1080" y1="60" x2="1080" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<rect x="25" y="16" width="170" height="44" rx="8" fill="#f0f0f0" stroke="#d1d1d1"/><text class="tb" x="110" y="39" text-anchor="middle" dominant-baseline="central" fill="#002e2b">You</text>
+<rect x="245" y="16" width="170" height="44" rx="8" fill="#20514e" stroke="#002e2b"/><text class="tb" x="330" y="39" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Designer</text>
+<rect x="505" y="16" width="170" height="44" rx="8" fill="#ffc000" stroke="#9a6700"/><text class="tb" x="590" y="39" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Maia Team</text>
+<rect x="765" y="16" width="170" height="44" rx="8" fill="#fff2cc" stroke="#ffc000"/><text class="tb" x="850" y="39" text-anchor="middle" dominant-baseline="central" fill="#4d3400">Amazon Bedrock</text>
+<rect x="995" y="16" width="170" height="44" rx="8" fill="#e7f4f2" stroke="#b7ddd9"/><text class="tb" x="1080" y="39" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Conversation history</text>
+<g class="sm" data-seq="prompt" data-step="1">
+<path class="a-ctl" d="M110 118 H330" marker-end="url(#ah-prompt)"/>
+<circle cx="140" cy="118" r="12" fill="#ffc000" stroke="#9a6700"/><text x="140" y="119" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">1</text>
+<text class="tb" x="162" y="104" text-anchor="start" dominant-baseline="central" fill="#002e2b">Send a prompt</text>
+<rect class="chipr" x="120" y="134" width="106" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="173.0" y="146" text-anchor="middle" dominant-baseline="central" fill="#002e2b">TLS 1.2 or 1.3</text>
+<rect class="chipr" x="234" y="134" width="155" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="311.5" y="146" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Certificate validation</text>
+<rect class="chipr" x="397" y="134" width="88" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="441.0" y="146" text-anchor="middle" dominant-baseline="central" fill="#002e2b">SSO and MFA</text>
+</g>
+<g class="sm" data-seq="prompt" data-step="2">
+<path class="a-ctl" d="M330 208 H590" marker-end="url(#ah-prompt)"/>
+<circle cx="360" cy="208" r="12" fill="#ffc000" stroke="#9a6700"/><text x="360" y="209" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">2</text>
+<text class="tb" x="382" y="194" text-anchor="start" dominant-baseline="central" fill="#002e2b">Check permissions and approvals</text>
+<rect class="chipr" x="340" y="224" width="81" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="380.5" y="236" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Role check</text>
+<rect class="chipr" x="429" y="224" width="69" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="463.5" y="236" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Approval</text>
+</g>
+<g class="sm" data-seq="prompt" data-step="3">
+<path class="a-ctl" d="M590 298 H660 V328 H594" marker-end="url(#ah-prompt)"/>
+<circle cx="682" cy="313" r="12" fill="#ffc000" stroke="#9a6700"/><text x="682" y="314" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">3</text>
+<text class="tb" x="702" y="313" text-anchor="start" dominant-baseline="central" fill="#002e2b">Assemble context</text>
+<rect class="chipr" x="600" y="340" width="100" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="650.0" y="352" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Metadata only</text>
+<rect class="chipr" x="708" y="340" width="118" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="767.0" y="352" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Secrets excluded</text>
+</g>
+<g class="sm" data-seq="prompt" data-step="4">
+<path class="a-ai" d="M590 398 H850" marker-end="url(#ah-prompt)" marker-start="url(#ah-prompt)"/>
+<circle cx="620" cy="398" r="12" fill="#ffc000" stroke="#9a6700"/><text x="620" y="399" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">4</text>
+<text class="tb" x="642" y="384" text-anchor="start" dominant-baseline="central" fill="#002e2b">Context out, reply back</text>
+<rect class="chipr" x="600" y="414" width="130" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="665.0" y="426" text-anchor="middle" dominant-baseline="central" fill="#002e2b">TLS 1.2 at minimum</text>
+<rect class="chipr" x="738" y="414" width="88" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="782.0" y="426" text-anchor="middle" dominant-baseline="central" fill="#002e2b">No training</text>
+</g>
+<g class="sm" data-seq="prompt" data-step="5">
+<path class="a-ctl" d="M590 488 H110" marker-end="url(#ah-prompt)"/>
+<circle cx="140" cy="488" r="12" fill="#ffc000" stroke="#9a6700"/><text x="140" y="489" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">5</text>
+<text class="tb" x="162" y="474" text-anchor="start" dominant-baseline="central" fill="#002e2b">Proposed change returns to your canvas</text>
+<rect class="chipr" x="120" y="504" width="136" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="188.0" y="516" text-anchor="middle" dominant-baseline="central" fill="#002e2b">TLS to your browser</text>
+<rect class="chipr" x="264" y="504" width="100" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="314.0" y="516" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Human commits</text>
+</g>
+<g class="sm" data-seq="prompt" data-step="6">
+<path class="a-ctl" d="M590 578 H1080" marker-end="url(#ah-prompt)"/>
+<circle cx="620" cy="578" r="12" fill="#ffc000" stroke="#9a6700"/><text x="620" y="579" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">6</text>
+<text class="tb" x="642" y="564" text-anchor="start" dominant-baseline="central" fill="#002e2b">Save the conversation</text>
+<rect class="chipr" x="600" y="594" width="124" height="22" rx="11" fill="#fff2cc" stroke="#ffc000"/><text class="ts" x="662.0" y="606" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Encrypted at rest</text>
+<rect class="chipr" x="732" y="594" width="63" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="763.5" y="606" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Own key</text>
+</g>
+</svg></div></div>
+    <div class="arch-card seqd-card" id="seqd-run" hidden><div class="arch-scroll"><svg class="seqd" id="svg-run" viewBox="0 0 1200 650" role="img" aria-label="Request walkthrough: run">
+<defs><marker id="ah-run" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<line x1="110" y1="60" x2="110" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="330" y1="60" x2="330" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="590" y1="60" x2="590" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="850" y1="60" x2="850" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<line x1="1080" y1="60" x2="1080" y2="638" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="4 5"/>
+<rect x="25" y="16" width="170" height="44" rx="8" fill="#f0f0f0" stroke="#d1d1d1"/><text class="tb" x="110" y="39" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Schedule or person</text>
+<rect x="245" y="16" width="170" height="44" rx="8" fill="#20514e" stroke="#002e2b"/><text class="tb" x="330" y="39" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Control plane</text>
+<rect x="505" y="16" width="170" height="44" rx="8" fill="#002e2b" stroke="#002e2b"/><text class="tb" x="590" y="39" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Runner</text>
+<rect x="765" y="16" width="170" height="44" rx="8" fill="#20514e" stroke="#002e2b"/><text class="tb" x="850" y="39" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Secret manager</text>
+<rect x="995" y="16" width="170" height="44" rx="8" fill="#f0f0f0" stroke="#d1d1d1"/><text class="tb" x="1080" y="39" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Sources and warehouse</text>
+<g class="sm" data-seq="run" data-step="1">
+<path class="a-ctl" d="M110 118 H330" marker-end="url(#ah-run)"/>
+<circle cx="140" cy="118" r="12" fill="#ffc000" stroke="#9a6700"/><text x="140" y="119" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">1</text>
+<text class="tb" x="162" y="104" text-anchor="start" dominant-baseline="central" fill="#002e2b">Start the run</text>
+<rect class="chipr" x="120" y="134" width="81" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="160.5" y="146" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Role check</text>
+<rect class="chipr" x="209" y="134" width="75" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="246.5" y="146" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Audit log</text>
+</g>
+<g class="sm" data-seq="run" data-step="2">
+<path class="a-ctl" d="M330 208 H590" marker-end="url(#ah-run)" marker-start="url(#ah-run)"/>
+<circle cx="578" cy="208" r="5" fill="#002e2b" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="360" cy="208" r="12" fill="#ffc000" stroke="#9a6700"/><text x="360" y="209" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">2</text>
+<text class="tb" x="382" y="194" text-anchor="start" dominant-baseline="central" fill="#002e2b">Task request and status</text>
+<rect class="chipr" x="340" y="224" width="161" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="420.5" y="236" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Outbound only, port 443</text>
+<rect class="chipr" x="509" y="224" width="124" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="571.0" y="236" text-anchor="middle" dominant-baseline="central" fill="#002e2b">TLS 1.2 or higher</text>
+<rect class="chipr" x="641" y="224" width="136" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="709.0" y="236" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Encrypted websocket</text>
+</g>
+<g class="sm" data-seq="run" data-step="3">
+<path class="a-sec" d="M590 298 H850" marker-end="url(#ah-run)" marker-start="url(#ah-run)"/>
+<circle cx="620" cy="298" r="12" fill="#ffc000" stroke="#9a6700"/><text x="620" y="299" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">3</text>
+<text class="tb" x="642" y="284" text-anchor="start" dominant-baseline="central" fill="#002e2b">Resolve a secret reference</text>
+<rect class="chipr" x="600" y="314" width="88" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="644.0" y="326" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Runner only</text>
+<rect class="chipr" x="696" y="314" width="118" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="755.0" y="326" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Never sent to AI</text>
+</g>
+<g class="sm" data-seq="run" data-step="4">
+<path class="a-data" d="M590 398 H1080" marker-end="url(#ah-run)" marker-start="url(#ah-run)"/>
+<circle cx="620" cy="398" r="12" fill="#ffc000" stroke="#9a6700"/><text x="620" y="399" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">4</text>
+<text class="tb" x="642" y="384" text-anchor="start" dominant-baseline="central" fill="#002e2b">Read, load and query</text>
+<rect class="chipr" x="600" y="414" width="167" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="683.5" y="426" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Source and warehouse TLS</text>
+<rect class="chipr" x="775" y="414" width="142" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="846.0" y="426" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Optional PrivateLink</text>
+</g>
+<g class="sm" data-seq="run" data-step="5">
+<path class="a-ctl" d="M1080 488 H1010 V518 H1076" marker-end="url(#ah-run)"/>
+<circle cx="988" cy="503" r="12" fill="#ffc000" stroke="#9a6700"/><text x="988" y="504" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">5</text>
+<text class="tb" x="968" y="503" text-anchor="end" dominant-baseline="central" fill="#002e2b">Transform in your warehouse</text>
+<rect class="chipr" x="740" y="530" width="161" height="22" rx="11" fill="#fff2cc" stroke="#ffc000"/><text class="ts" x="820.5" y="542" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Your warehouse controls</text>
+<rect class="chipr" x="909" y="530" width="161" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="989.5" y="542" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Your cloud’s encryption</text>
+</g>
+<g class="sm" data-seq="run" data-step="6">
+<path class="a-ctl" d="M590 578 H330" marker-end="url(#ah-run)"/>
+<circle cx="360" cy="578" r="12" fill="#ffc000" stroke="#9a6700"/><text x="360" y="579" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#002e2b">6</text>
+<text class="tb" x="382" y="564" text-anchor="start" dominant-baseline="central" fill="#002e2b">Status and results return</text>
+<rect class="chipr" x="340" y="594" width="124" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="402.0" y="606" text-anchor="middle" dominant-baseline="central" fill="#002e2b">TLS 1.2 or higher</text>
+<rect class="chipr" x="472" y="594" width="88" height="22" rx="11" fill="#e7f4f2" stroke="#b7ddd9"/><text class="ts" x="516.0" y="606" text-anchor="middle" dominant-baseline="central" fill="#002e2b">Audit trail</text>
+</g>
+</svg></div></div>
+    <p class="hint" id="seqnote-run" hidden>With Full SaaS, Matillion hosts the runner and the vault, so step 2 is managed by Matillion.</p>
+    <ol class="seq" id="seq-prompt">
+      <li><strong>You send a prompt from Designer.</strong><p>Your browser connects over TLS 1.2 or 1.3 after you sign in with SSO or MFA.</p><div class="chips"><span class="chip">TLS 1.2 or 1.3</span><span class="chip">Certificate validation</span><span class="chip">SSO and MFA</span></div></li>
+      <li><strong>Maia Team checks what you’re allowed to do.</strong><p>It can’t exceed your permissions, and it asks before it samples data or runs a pipeline.</p><div class="chips"><span class="chip">Role check</span><span class="chip">Approval</span></div></li>
+      <li><strong>It assembles context.</strong><p>Your prompt, table and column names, pipeline definitions, context files and, if allowed, a bounded sample of rows. Secret values are never included.</p><div class="chips"><span class="chip">Metadata only</span><span class="chip">Secrets excluded</span></div></li>
+      <li><strong>Context goes to Amazon Bedrock.</strong><p>Matillion’s control plane calls the model in Matillion’s own AWS account for inference only.</p><div class="chips"><span class="chip">TLS 1.2 at minimum</span><span class="chip">No training</span></div></li>
+      <li><strong>The reply comes back as a proposal.</strong><p>You see the change on the canvas. Nothing commits until you do.</p><div class="chips"><span class="chip">TLS to your browser</span><span class="chip">Human commits</span></div></li>
+      <li><strong>The conversation is saved.</strong><p>It’s kept for two years, per user and branch, and you can’t see anyone else’s.</p><div class="chips"><span class="chip yellow">Encrypted at rest</span><span class="chip">Own key</span></div></li>
+    </ol>
+    <ol class="seq" id="seq-run" hidden>
+      <li><strong>A schedule or a person starts the run.</strong><p>The scheduler and workflow engine start it, subject to project roles.</p><div class="chips"><span class="chip">Role check</span><span class="chip">Audit log</span></div></li>
+      <li><strong>The control plane sends a task request.</strong><p>With Hybrid SaaS, the runner holds an outbound connection to Matillion, so no inbound ports are opened in your network.</p><div class="chips"><span class="chip">Outbound only, port 443</span><span class="chip">TLS 1.2 or higher</span><span class="chip">Encrypted websocket</span></div></li>
+      <li><strong>The runner resolves its secrets.</strong><p>Only the runner turns a secret reference into a value, using your secret manager with Hybrid SaaS or Matillion’s hosted vault with Full SaaS.</p><div class="chips"><span class="chip">Runner only</span><span class="chip">Never sent to AI</span></div></li>
+      <li><strong>The runner connects to your sources and warehouse.</strong><p>Connections follow each system’s own security settings, and PrivateLink is available in some setups.</p><div class="chips"><span class="chip">Source and warehouse TLS</span><span class="chip">Optional PrivateLink</span></div></li>
+      <li><strong>Data loads and transforms in your warehouse.</strong><p>Your customer data isn’t copied to Matillion.</p><div class="chips"><span class="chip yellow">Your warehouse controls</span><span class="chip">Your cloud’s encryption</span></div></li>
+      <li><strong>Status returns to Maia.</strong><p>Run history and notifications show the outcome, and the audit service keeps the record.</p><div class="chips"><span class="chip">TLS 1.2 or higher</span><span class="chip">Audit trail</span></div></li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="tag">What reaches the AI</p>
+    <h2>What reaches the model, and what never does</h2>
+    <div class="grid cols-2" style="margin-top:20px">
+      <div class="card teal"><h3>What reaches the model</h3><p>Prompts and replies, table and column names, pipeline definitions and context files. Also a bounded sample of rows, up to 200, when sampling is on. You can switch sampling off so Maia works from metadata only.</p></div>
+      <div class="card yellow"><h3>What never does</h3><p>Secret values, configured environment values and bulk copies of your warehouse. Nothing sent is used to train, fine-tune or benchmark any model.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="tag">Control and oversight</p>
+    <h2>Maia proposes, people decide</h2>
+    <p class="sec-lede">Maia has no standing privilege of its own. It acts as the person who invoked it.</p>
+    <h3 class="grp">Levels of oversight</h3>
+    <p class="grp-lede">How much Maia does before a person steps in.</p>
+    <div class="grid cols-3" style="margin-top:16px">
+      <div class="card"><h3>Assisted</h3><p>The default. Maia proposes a change and a person reviews and commits it.</p></div>
+      <div class="card teal"><h3>Supervised</h3><p>Maia asks first before sampling data, running a query, executing a pipeline or deleting an object.</p></div>
+      <div class="card yellow"><h3>Customer-configured automation</h3><p>Opt-in only. Maia can’t switch it on, and it runs within the task identity’s permissions.</p></div>
+    </div>
+    <h3 class="grp">Layers of access control</h3>
+    <p class="grp-lede">Three switches that decide who can use Maia and what it can do.</p>
+    <div class="grid cols-3" style="margin-top:16px">
+      <div class="card"><h3>Account</h3><p>Switch Maia off for the whole account, which also works as an emergency stop.</p></div>
+      <div class="card"><h3>User</h3><p>Grant or withhold Maia for each user as part of their role.</p></div>
+      <div class="card"><h3>Action</h3><p>Explicit approval for anything that reads data or changes state.</p></div>
+    </div>
+    <h3 class="grp">Built-in safeguards</h3>
+    <p class="grp-lede">Guardrails built into how Maia works.</p>
+    <div class="grid cols-3" style="margin-top:16px">
+      <div class="card"><h3>Inherited permissions</h3><p>Maia can’t exceed the access of the person who invoked it.</p></div>
+      <div class="card"><h3>One-way secrets</h3><p>Maia can use a secret through a runner, but never read it.</p></div>
+      <div class="card"><h3>Nothing auto-commits</h3><p>Changes are held until you commit them, and you can interrupt Maia at any point.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="tag">Shared responsibility</p>
+    <h2>Who owns what</h2>
+    <div class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Control</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr><td>Model choice and inference cost</td><td>Matillion</td></tr>
+          <tr><td>What data reaches the model</td><td>Matillion, within your permissions and sampling setting</td></tr>
+          <tr><td>Prompt-injection screening</td><td>Matillion</td></tr>
+          <tr><td>Who may use Maia</td><td>Matillion builds the controls and you operate them</td></tr>
+          <tr><td>Which environments Maia can reach</td><td>You, by scoping identity permissions</td></tr>
+          <tr><td>Warehouse grants and runner configuration</td><td>You</td></tr>
+          <tr><td>S3 staging encryption</td><td>You, per component</td></tr>
+          <tr><td>Recovery from a bad pipeline run</td><td>You, through warehouse backup and time travel</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="tag">Where data lives</p>
+    <h2>Three kinds of data, three treatments</h2>
+    <div class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Kind of data</th><th>What it is</th><th>How it’s handled</th></tr></thead>
+        <tbody>
+          <tr><td>Customer data</td><td>Data you load from sources into your warehouse or storage</td><td>Subject to regional protections, and not stored by or accessible to Matillion</td></tr>
+          <tr><td>Customer metadata</td><td>Your pipeline and project configurations</td><td>Held in your account region, and some of it can sit in your own Git repository</td></tr>
+          <tr><td>Usage metadata</td><td>Logins, roles and permissions, and component usage, including billing information</td><td>Used globally, and excluded from regional protections</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint" style="margin-top:12px">Your account region is fixed when you create the account. Maia Team’s AI processing may run within a broader geographic boundary tied to that region, called an Inference Zone.</p>
+  </section>
+
+  <section>
+    <p class="tag">How to verify it</p>
+    <h2>Assurance you can check</h2>
+    <div class="grid cols-3" style="margin-top:20px">
+      <div class="card teal"><h3>Certifications and standards</h3><p>Maia sits inside Matillion’s SOC 2 and ISO 27001 boundary, and Matillion documents alignment with GDPR and HIPAA. AI controls are mapped to the OWASP Top 10 for LLM Applications and the NIST AI Risk Management Framework.</p></div>
+      <div class="card"><h3>Testing</h3><p>An annual penetration test, with the summary available in the Trust Center, plus a continuous bug bounty.</p></div>
+      <div class="card yellow"><h3>Retention</h3><p>Conversation history is kept for two years, observability traces for 30 days, and the model provider retains no prompts or completions.</p></div>
+    </div>
+    <div class="grid cols-3" style="margin-top:20px">
+      <div class="card"><h3>Trust Center</h3><p>Certifications, audit reports, the Data Processing Agreement and the penetration test summary.</p><p style="margin:0"><a href="https://www.matillion.com/trust-center" rel="noopener">Open the Trust Center</a></p></div>
+      <div class="card"><h3>Security whitepaper</h3><p>Matillion’s description of its security architecture and processes.</p><p style="margin:0"><a href="https://www.matillion.com/uploads/trust-center/Security-Whitepaper_v3_FINAL.pdf" rel="noopener">Read the whitepaper</a></p></div>
+      <div class="card"><h3>Maia documentation</h3><p>Architecture, security and administration guides.</p><p style="margin:0"><a href="https://docs.maia.ai" rel="noopener">Open docs.maia.ai</a></p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card dark" style="padding:28px 30px">
+      <h3 style="color:#fff">Questions for your own review?</h3>
+      <p style="color:var(--teal-200);margin-bottom:0">Share your security questionnaire with your Matillion team. They can confirm details for your plan, region and deployment model.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site"><div class="wrap"><svg style="height:20px;width:auto" role="img" aria-label="Maia by Matillion" id="maia_bee_icon_Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 326.6 376.3">
+  <defs>
+    <style>
+      .maia_bee_icon_st0 { fill: url(#maia_bee_icon_linear-gradient2); }
+      .maia_bee_icon_st1 { fill: url(#maia_bee_icon_linear-gradient1); }
+      .maia_bee_icon_st2 { fill: url(#maia_bee_icon_linear-gradient3); }
+      .maia_bee_icon_st3 { fill: url(#maia_bee_icon_linear-gradient5); }
+      .maia_bee_icon_st4 { fill: url(#maia_bee_icon_linear-gradient4); }
+      .maia_bee_icon_st5 { fill: url(#maia_bee_icon_linear-gradient); }
+      .maia_bee_icon_st6 { isolation: isolate; }
+      .maia_bee_icon_st7 { mix-blend-mode: multiply; }
+    </style>
+    <linearGradient id="maia_bee_icon_linear-gradient" x1="336.3" y1="-5211.7" x2="255" y2="-5104.8" gradientTransform="translate(0 5132.2)" gradientUnits="userSpaceOnUse">
+      <stop offset=".7" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient1" x1="122.3" y1="-5196.1" x2="60.7" y2="-5105" gradientTransform="translate(0 5132.2)" gradientUnits="userSpaceOnUse">
+      <stop offset=".5" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient2" x1="346.8" y1="168.4" x2="202.5" y2="51.9" gradientTransform="translate(0 378) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient3" x1="196.8" y1="297" x2="87.9" y2="200.7" gradientTransform="translate(0 378) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient4" x1="223.6" y1="266.7" x2="114.7" y2="170.4" gradientTransform="translate(0 378) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient5" x1="-86.2" y1="-4707.6" x2="320" y2="-5088.9" gradientTransform="translate(0 5132.2)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ab6f00"/>
+      <stop offset=".1" stop-color="#c98c00"/>
+      <stop offset=".2" stop-color="#e0a300"/>
+      <stop offset=".4" stop-color="#f1b300"/>
+      <stop offset=".5" stop-color="#fabd00"/>
+      <stop offset=".6" stop-color="#ffc000"/>
+      <stop offset="1" stop-color="#fff1cc"/>
+    </linearGradient>
+  </defs>
+  <g class="maia_bee_icon_st6">
+    <g id="maia_bee_icon_Layer_2">
+      <g id="maia_bee_icon_Layer_11" data-name="Layer_1">
+        <g class="maia_bee_icon_st7">
+          <g>
+            <path class="maia_bee_icon_st5" d="M248.9,25l-2.9,4.6c-1.6,2.6-.7,6,1.9,7.5l4.3,2.4c2.6,1.5,5.8.7,7.3-1.9l2.8-4.5,7.1.2c1.8,0,3.4-.8,4.3-2.3l7-11.5c.9-1.5,1-3.3.1-4.9l-6.4-11.8c-.8-1.5-2.4-2.5-4.1-2.6l-13.4-.3c-1.8,0-3.4.9-4.3,2.3l-7,11.5c-.9,1.5-1,3.3-.1,4.9l3.4,6.3h0Z"/>
+            <path class="maia_bee_icon_st1" d="M52.7,31.3c.9,1.5,2.5,2.4,4.3,2.3l7.1-.2,2.7,4.3c1.6,2.5,4.8,3.3,7.3,1.9l4.3-2.4c2.7-1.5,3.5-4.9,1.9-7.5l-2.7-4.5,3.4-6.3c.8-1.5.8-3.4-.1-4.9l-7-11.5c-.9-1.5-2.5-2.4-4.3-2.3l-13.4.4c-1.8,0-3.3,1-4.2,2.6l-6.4,11.8c-.8,1.5-.8,3.4.1,4.9l7,11.5h0s0,0,0,0Z"/>
+          </g>
+          <path class="maia_bee_icon_st0" d="M247.1,237.5l-1.9-5.1c-9.1,28.1-31.2,50.2-59.3,59.3,28.1,9.1,50.3,31.4,59.3,59.3,9-27.9,31.3-50.3,59.3-59.3-26.2-8.6-47.6-28.3-57.4-54.2h0s0,0,0,0Z"/>
+          <path class="maia_bee_icon_st2" d="M95.4,140.6h0c9.4,0,17.1,7.6,17.1,17.1v25.8c0,9.4-7.6,17.1-17.1,17.1h0c-9.4,0-17.1-7.6-17.1-17.1v-25.8c0-9.4,7.6-17.1,17.1-17.1Z"/>
+          <path class="maia_bee_icon_st4" d="M156.6,140.6h0c9.4,0,17.1,7.6,17.1,17.1v25.8c0,9.4-7.6,17.1-17.1,17.1h0c-9.4,0-17.1-7.6-17.1-17.1v-25.8c0-9.4,7.6-17.1,17.1-17.1Z"/>
+          <path class="maia_bee_icon_st3" d="M294,84.7l-98.2-56.7c-20.1-11.6-45-11.6-65.1,0l-98.2,56.7C12.5,96.3,0,117.9,0,141.1v113.4c0,23.2,12.5,44.8,32.5,56.4l98.2,56.7c10,5.8,21.3,8.7,32.6,8.7s22.5-2.9,32.6-8.7l17.5-10.1s0,0,0,0c7.2-4.7,9.5-14.3,5.2-21.8l-1.8-3h0c-6.4-9.3-15.2-16.7-25.6-21.4-8.2-3.7-17.8-3.2-25.6,1.4h0c-10.4,6-23.2,6-33.6,0l-80.1-46.3c-10.4-6-16.8-17.1-16.8-29.1v-92.5c0-12,6.4-23.1,16.8-29.1l80.1-46.2c10.4-6,23.2-6,33.6,0l80.1,46.2c10.4,6,16.8,17.1,16.8,29.1v74.5c0,29.6,24.2,53.7,53.7,53.7h1.2c5.1,0,9.3-4,9.3-8.8h0v-123.1c0-23.2-12.5-44.8-32.5-56.4h0Z"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg> <span style="vertical-align:middle;margin-left:8px">This page summarizes the Maia documentation and Matillion’s AI security whitepaper as of November 2026 and isn’t a contractual commitment. Capabilities vary by plan, and the Trust Center and your agreement are authoritative. See <a href="https://docs.maia.ai" rel="noopener">docs.maia.ai</a> for details.</span></div></footer>
+
+<script>
+(function () {
+  document.documentElement.classList.add('js');
+  var DETAILS = {"users": ["Your users", "People sign in to Maia and work in Designer.", "Credentials and identity. Maia supports a username and password, Google or Microsoft sign-in, and custom single sign-on with SAML or OpenID Connect on specific plans.", "Multi-factor authentication, single sign-on, re-authentication every 10 hours, and roles at account, project and environment level."], "sources": ["Sources", "The systems your pipelines read from, such as databases, SaaS applications and files. Connectors run in the runner.", "Your source data, which moves through the runner into your warehouse. Matillion doesn’t store it.", "Source credentials sit in a secret manager, never in pipeline definitions."], "warehouse": ["Data warehouse", "Your cloud data warehouse, where pipelines load and transform data.", "Your customer data. It isn’t stored by or accessible to Matillion.", "Warehouse grants and roles you set, one environment connection per project, and least-privilege access for the identity Maia uses."], "runner-hybrid": ["Hybrid SaaS runner", "Runs pipeline components and connectors inside your own VPC or VNet. It’s the only part that turns a secret reference into a secret value.", "Your customer data in flight, and secret values at run time.", "You choose where it runs (AWS, Azure, Google Cloud or Snowflake), how the network is isolated, and whether it uses the Current or Stable update track. It connects outbound to Matillion’s control plane over TLS 1.2 or higher. Private connectivity options are described in the Maia documentation."], "secrets-customer": ["Secret manager", "Your own AWS Secrets Manager, Azure Key Vault or Google Cloud Secret Manager holds the secret values.", "Passwords, keys and tokens.", "Maia stores references, not values. Maia Team can use a secret through the runner but can never read it."], "git-customer": ["Your Git repo", "An optional customer-hosted Git repository for your pipelines, available with Hybrid SaaS.", "Pipeline definitions and project files.", "Your repository’s own access controls, HTTPS, encryption in transit and backups. Maia Team never commits changes automatically."], "designer": ["Designer", "Where you build and review pipelines on a canvas. Git operations run natively, with no local copies to maintain.", "Pipeline definitions and project configuration, plus component metadata for design-time requests.", "Roles at account, project and environment level. Changes are held until you commit them."], "mission-control": ["Mission Control", "A workspace to assign and track Maia Team tasks across projects. Tasks can work on a new branch.", "Task prompts and progress.", "Project permissions apply, and account admins can turn Mission Control off along with Maia Team."], "context-engine": ["Context Engine", "Builds a knowledge graph from the warehouse metadata and pipeline history you nominate, so Maia Team understands your tables, columns and relationships.", "Metadata only, such as table and column names, relationships and pipeline definitions. It indexes only what you nominate.", "Account admins can turn it off together with Maia Team."], "maia-team": ["Maia Team", "The agentic assistant that plans, builds, explains and troubleshoots pipelines from plain language.", "Your prompts and its replies, table and column names, pipeline definitions, context files, and a bounded sample of rows (up to 200) if you allow sampling.", "Assisted by default: Maia Team proposes and a person commits. It asks before sampling data or running a pipeline, can’t exceed the invoking user’s permissions, can’t read secret values, and can be interrupted at any point. Admins can turn it off, or turn off sampling."], "component-info": ["Component info", "The Component Information service gives Designer the metadata for components and handles design-time requests.", "Component metadata.", "None needed. It serves design-time information only."], "api-gateway": ["API gateway", "Controlled access to your pipelines through secure public API endpoints.", "API requests and responses.", "API access tokens last 24 hours, and authentication and authorization apply to every call."], "audit": ["Audit service", "Records who did what and when, available in the platform and through the Audit API.", "User identifiers and actions, kept for a rolling 90 days in the platform and API.", "Only users with the View Audit Events permission can read logs. Maia approvals are recorded too."], "runner-gateway": ["Runner gateway", "Sends task requests to runners and keeps communication with them secure.", "Task requests and run status.", "Runners connect outbound over TLS 1.2 or higher, with encrypted websocket connections and strong authentication between runners and the control plane."], "scheduler": ["Scheduler", "Starts pipeline runs on schedules and triggers. Schedules run published artifacts, either the latest version or a specific one.", "Schedule definitions and run requests.", "Project roles decide who can create schedules. Notifications and run history show the outcome."], "workflow": ["Workflow execution", "The Workflow Execution Engine orchestrates pipeline execution and records run history for monitoring and performance tracking.", "Run state and history.", "Run history, notifications and lineage on supported plans."], "runner-saas": ["Matillion-hosted runner", "The Full SaaS runner, hosted and managed by Matillion, so there’s no runner infrastructure for you to deploy or upgrade. Its Connector Service retrieves data from sources such as Salesforce, SAP and databases.", "Your customer data in flight, and secret values at run time.", "Matillion manages scaling and updates. You can grant it limited cloud access by supplying IAM credentials, using least privilege."], "vault-hosted": ["Hosted vault", "Matillion’s hosted vault stores the secrets you define in your project when you use Full SaaS.", "Passwords, keys and tokens.", "You define secrets from within your project, and only the runner resolves them at run time."], "project-git": ["Project metadata and Git", "Matillion-hosted Git holds your pipelines and project configuration, unless you bring your own repository with Hybrid SaaS.", "Customer metadata, stored in your account region.", "Version control, branches and pull requests. Account region is fixed when you create the account."], "history": ["Conversation history", "Your Maia Team conversations are saved so you can pick up where you left off.", "Prompts and replies, kept for two years, per user and per branch, and encrypted with their own key.", "You can never view another user’s conversations."], "bedrock": ["Amazon Bedrock", "Provides the model inference for Maia Team, called from Matillion’s own AWS account.", "Prompts and context only.", "Inference only. Nothing is retained by the model provider, and nothing sent is used to train, fine-tune or benchmark any model. It doesn’t browse the open web, and documentation lookups use an allow-list."], "third-party": ["Third-party AI services", "The AI Prompt components call services such as AWS Bedrock, OpenAI or OpenAI on Azure, using your own API keys.", "Whatever data you choose to pass to the component.", "They run only if your team adds those components to a pipeline."]};
+  var svg = document.getElementById('arch');
+  var modeBtns = Array.prototype.slice.call(document.querySelectorAll('#mode button'));
+  var comps = Array.prototype.slice.call(svg.querySelectorAll('.comp'));
+  var tEl = document.getElementById('d-title');
+  var wEl = document.getElementById('d-what');
+  var dEl = document.getElementById('d-data');
+  var cEl = document.getElementById('d-ctl');
+  var cols = document.getElementById('d-cols');
+  var selected = null;
+
+  function setMode(m) {
+    svg.setAttribute('data-mode', m);
+    modeBtns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mode') === m ? 'true' : 'false'); });
+    if (selected && selected.getBoundingClientRect().width === 0) { clearSel(); }
+  }
+  function clearSel() {
+    if (selected) { selected.classList.remove('sel'); }
+    selected = null;
+    tEl.textContent = 'Select a component';
+    wEl.textContent = 'Choose any box in the diagram. In Hybrid SaaS, the runner and your secrets stay in your own cloud. In Full SaaS, Matillion hosts the runner and a vault for you.';
+    cols.hidden = true;
+  }
+  function select(g) {
+    var d = DETAILS[g.getAttribute('data-id')];
+    if (!d) { return; }
+    if (selected) { selected.classList.remove('sel'); }
+    selected = g;
+    g.classList.add('sel');
+    tEl.textContent = d[0];
+    wEl.textContent = d[1];
+    dEl.textContent = d[2];
+    cEl.textContent = d[3];
+    cols.hidden = false;
+  }
+  comps.forEach(function (g) {
+    g.addEventListener('click', function () { select(g); });
+    g.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(g); }
+    });
+  });
+  modeBtns.forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); }); });
+  var tlsBtn = document.getElementById('tls');
+  var tlsKey = document.getElementById('tls-key');
+  if (tlsBtn) {
+    tlsBtn.addEventListener('click', function () {
+      var on = !svg.classList.contains('tls-on');
+      svg.classList.toggle('tls-on', on);
+      svg.setAttribute('viewBox', on ? '0 0 1240 770' : '0 0 1240 700');
+      tlsBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      tlsBtn.textContent = on ? 'Hide TLS' : 'Show TLS';
+      tlsKey.hidden = !on;
+    });
+  }
+  var seqBtns = Array.prototype.slice.call(document.querySelectorAll('#seqmode button'));
+  seqBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-seq');
+      seqBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      document.getElementById('seq-prompt').hidden = k !== 'prompt';
+      document.getElementById('seq-run').hidden = k !== 'run';
+      document.getElementById('seqd-prompt').hidden = k !== 'prompt';
+      document.getElementById('seqd-run').hidden = k !== 'run';
+      document.getElementById('seqnote-run').hidden = k !== 'run';
+    });
+  });
+  ['prompt', 'run'].forEach(function (k) {
+    var list = document.getElementById('seq-' + k);
+    var dsvg = document.getElementById('svg-' + k);
+    Array.prototype.slice.call(list.children).forEach(function (li, i) {
+      li.setAttribute('tabindex', '0');
+      function on() {
+        var m = dsvg.querySelector('.sm[data-step="' + (i + 1) + '"]');
+        dsvg.classList.add('hl-on');
+        if (m) { m.classList.add('hl'); }
+      }
+      function off() {
+        dsvg.classList.remove('hl-on');
+        Array.prototype.slice.call(dsvg.querySelectorAll('.sm.hl')).forEach(function (x) { x.classList.remove('hl'); });
+      }
+      li.addEventListener('mouseenter', on); li.addEventListener('focus', on);
+      li.addEventListener('mouseleave', off); li.addEventListener('blur', off);
+    });
+  });
+  setMode('hybrid');
+})();
+</script>
+</body>
+</html>
