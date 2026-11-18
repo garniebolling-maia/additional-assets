@@ -225,6 +225,19 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 .g-br { stroke: #20514e; stroke-width: 3; fill: none; stroke-linecap: round; }
 .arr { stroke: #20514e; stroke-width: 1.5; fill: none; }
 .ret { stroke: #477a75; stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+.grp { font-size: 22px; margin: 40px 0 0; }
+.plain { margin: 8px 0 0; padding-left: 20px; }
+.plain li { margin-bottom: 6px; }
+.seg { display: inline-flex; border: 1.5px solid var(--pg-text); border-radius: 999px; overflow: hidden; }
+.seg button { font: inherit; font-weight: 600; font-size: 14px; padding: 8px 20px; border: 0; background: transparent; color: var(--pg-text); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--yellow-500); color: var(--green-900); }
+.seg button:focus-visible { outline: 3px solid var(--yellow-500); outline-offset: -3px; }
+.seq { list-style: none; counter-reset: step; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; }
+.seq[hidden], #p-azure[hidden], #p-github[hidden] { display: none; }
+.seq li { counter-increment: step; position: relative; background: var(--card); border-radius: 12px; padding: 16px 20px 16px 64px; }
+.seq li::before { content: counter(step); position: absolute; left: 20px; top: 16px; width: 28px; height: 28px; border-radius: 50%; background: var(--yellow-500); color: var(--green-900); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.seq li p { margin: 4px 0 0; }
+.seq li p.sub { margin-top: 8px; font-size: 14px; opacity: .85; }
 </style>
 </head>
 <body>
@@ -384,7 +397,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 <p>For your own repository, you install the Maia app once. Maia connects over OAuth, honors the permissions you set in your Git platform, and you can revoke its access at any time.</p>
 <p class="label">Maia capabilities</p>
 <div class="chips"><span class="chip yellow">Maia Hosted Git</span><span class="chip yellow">GitHub</span><span class="chip yellow">Azure DevOps</span><span class="chip yellow">GitLab</span><span class="chip yellow">Bitbucket</span></div>
-<p class="note">The connection is fixed per project. Connecting your own repository is available on specific Maia plans, and GitHub Enterprise Server isn’t supported.</p>
+<p class="note">The connection is fixed per project. Connecting your own repository is available on specific Maia plans, and GitHub Enterprise Server isn’t supported. The setup guide below walks through the connection.</p>
 </article>
 <article class="step-card" data-step="1">
 <p class="tag">Step 2 of 7</p>
@@ -452,6 +465,72 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
         <p class="hint no-js-hide">Use the left and right arrow keys to move between steps.</p>
       </div>
     </div>
+  </section>
+
+
+  <section id="connect">
+    <p class="tag">Setup guide</p>
+    <div class="head-row"><h2>Connect Maia to your repository</h2>
+      <div class="seg no-js-hide" id="platform" role="group" aria-label="Git platform">
+        <button type="button" data-p="github" aria-pressed="true">GitHub</button>
+        <button type="button" data-p="azure" aria-pressed="false">Azure DevOps</button>
+      </div>
+    </div>
+    <p class="sec-lede">You set up the connection once, when you create a project. After that, every user authorizes their own account the first time they use a Git action.</p>
+
+    <div class="grid cols-2" style="margin-top:20px">
+      <div class="card teal"><h3>Before you start</h3>
+        <ul class="plain"><li>Your Maia plan includes connecting your own Git repository.</li><li>You have an organization account on your Git platform, not a personal one.</li><li>Someone can install apps and create a repository there.</li><li>The repository has a <code>main</code> branch.</li></ul></div>
+      <div class="card"><h3>Good to know</h3>
+        <ul class="plain"><li>Maia connects with OAuth and honors the permissions set in your Git platform.</li><li>Maia stores each user’s access and refresh tokens in the Matillion secure vault, and nothing else sensitive about the user.</li><li>You can revoke Maia’s access at any time from your Git platform.</li></ul></div>
+    </div>
+
+    <div id="p-github">
+      <ol class="seq">
+<li><div class="chips" style="margin-bottom:6px"><span class="chip">In GitHub</span></div><strong>Create a repository</strong><p>In your GitHub organization, create a new repository and initialize it with a README file. That creates the <code>main</code> branch, which Maia requires. Use the repository only for your Maia pipelines.</p><p class="sub">Using an existing repository? Only its <code>main</code> branch syncs to the Maia project, and its other branches are ignored.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip">In GitHub</span></div><strong>Install the Maia app</strong><p>Open the Maia Integration app on GitHub Marketplace and install it in your organization account, not a personal account. Choose <strong>Only select repositories</strong> and pick the repository from step 1. The app needs read and write access to repository contents and to workflow files. You only install it once.</p><p class="sub">Check the install at <code>github.com/organizations/&lt;your-org&gt;/settings/installations</code>.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip">In GitHub</span></div><strong>Check roles and network access</strong><p>Give everyone who will build pipelines at least the <strong>Write</strong> role on the repository. If your organization uses an IP allowlist, add Maia’s Git IP addresses for your region, or turn on GitHub’s setting that adds the IP addresses of installed apps.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Create a project</strong><p>Go to <strong>Projects</strong> and choose <strong>Add project</strong>. Enter a name, description and data platform, then choose <strong>Advanced settings</strong>. Pick Full SaaS or Hybrid SaaS, create your environment, and continue to the Git provider step.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Authorize GitHub</strong><p>Select <strong>GitHub</strong> and continue. A new tab opens, where you click <strong>Authorize Maia</strong>. If you sign in to GitHub with SSO, click <strong>Authorize</strong>, not Continue. Back in Maia, confirm your account in the dialog.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Select the repository</strong><p>Choose your repository from the list of repositories you’ve granted access to, then click <strong>Finish</strong>. Maia doesn’t create repositories, so it has to exist already. Your project opens with Branches, Environments, Artifacts, Schedules and more.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Invite teammates (optional)</strong><p>Add them as project users. They should be members of the same GitHub organization where the app is installed.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Confirm the connection</strong><p>Open <strong>Branches</strong> and look for <code>main</code>. Create a branch, commit and push, then check it appears in GitHub. Create a branch in GitHub and check it appears in Maia.</p></li>
+      </ol>
+    </div>
+    <div id="p-azure">
+      <ol class="seq">
+<li><div class="chips" style="margin-bottom:6px"><span class="chip">In Azure DevOps</span></div><strong>Create a repository</strong><p>In your Azure DevOps organization and project, create a new repository and initialize it with a README file. That creates the <code>main</code> branch, which Maia requires.</p><p class="sub">Using an existing repository? All of its existing branches appear in Maia.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip">In Azure DevOps</span></div><strong>Check access and network access</strong><p>Users need to be in the <strong>Contributor</strong> security group with <strong>Basic</strong> access at minimum, or have Read and Write permissions if you use custom groups. If Entra Conditional Access limits IP addresses, add Maia’s Git IP addresses to a named location it allows.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Create a project</strong><p>Go to <strong>Projects</strong> and choose <strong>Add project</strong>. Enter a name, description and data platform, then choose <strong>Advanced settings</strong>. Pick Full SaaS or Hybrid SaaS, create your environment, and continue to the Git provider step.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip">In Azure DevOps</span></div><strong>Install the Maia app</strong><p>Select <strong>Azure DevOps</strong>. You’re redirected to sign in with a work, business or school account and to consent for the app. You only install it once per Azure tenant.</p><p class="sub">If consent needs an admin, invite them to your Maia organization and have them start project creation as far as the repository step. They can then grant consent for “Maia for Azure DevOps” under Enterprise applications in the Azure portal. Don’t use Microsoft’s suggestion to sign in with admin credentials, because that captures the admin’s token instead of yours.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Select the repository</strong><p>Choose your repository from the <strong>Project repository</strong> list and click <strong>Finish</strong>.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Invite teammates (optional)</strong><p>Add them as project users. They should be members of the same Azure DevOps organization.</p></li>
+<li><div class="chips" style="margin-bottom:6px"><span class="chip yellow">In Maia</span></div><strong>Confirm the connection</strong><p>Open <strong>Branches</strong> and look for <code>main</code>. Create a branch, commit and push, then check it appears in Azure DevOps.</p></li>
+      </ol>
+    </div>
+    <p class="hint" style="margin-top:12px">GitLab and Bitbucket follow the same pattern, each with its own prerequisites guide in the <a href="https://docs.maia.ai" rel="noopener">Maia documentation</a>.</p>
+
+    <h3 class="grp">How syncing works once you’re connected</h3>
+    <div class="grid cols-3" style="margin-top:16px">
+      <div class="card"><h3>Pushes and pulls are explicit</h3><p>Your online copy in Designer isn’t synced automatically in either direction. Push sends your commits to the repository, and Pull brings changes in.</p></div>
+      <div class="card teal"><h3>Branches show up on both sides</h3><p>Branches you create in Maia appear in your repository once you push them, and branches created in your Git platform appear in Maia.</p></div>
+      <div class="card yellow"><h3>Each user authorizes</h3><p>The first Git action prompts a user to authorize. Anyone who picked the wrong account can reauthorize from the project page.</p></div>
+    </div>
+
+    <h3 class="grp">If GitHub doesn’t connect</h3>
+    <div class="table-wrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>What you see</th><th>Likely cause</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td>Your repository isn’t in the list</td><td>The Maia app isn’t installed in the organization, isn’t granted access to that repository, or your user lacks the Write role</td><td>Check the app’s installation settings and repository list, then check your repository role. Reauthorize if you signed in with the wrong account.</td></tr>
+          <tr><td>Authorization fails</td><td>A temporary problem connecting to GitHub or Maia</td><td>Refresh and try again, and check the GitHub and Matillion status pages.</td></tr>
+          <tr><td>Repositories won’t list, or pull and push fail</td><td>An IP allowlist is blocking Maia</td><td>Ask an organization owner to add Maia’s Git IP addresses for your region, or enable the app IP allowlist setting.</td></tr>
+          <tr><td>Remote actions fail after signing in with SSO</td><td>You clicked Continue instead of Authorize</td><td>Reauthorize from the project page and click Authorize.</td></tr>
+          <tr><td>You can’t see pipelines in Designer</td><td>You don’t have the Write role, or the repository has no <code>main</code> branch</td><td>Fix the role, and make sure <code>main</code> exists. Making it the default branch avoids surprises.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint" style="margin-top:12px">Azure DevOps, GitLab and Bitbucket each have their own troubleshooting guide in the Maia documentation. To move a project to a different repository or provider later, use the Repository Migration API.</p>
   </section>
 
   <section>
@@ -675,6 +754,20 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
   });
 
   render();
+})();
+</script>
+<script>
+(function () {
+  var seg = document.getElementById('platform');
+  if (!seg) { return; }
+  var btns = Array.prototype.slice.call(seg.querySelectorAll('button'));
+  var gh = document.getElementById('p-github'), az = document.getElementById('p-azure');
+  function show(k) {
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-p') === k ? 'true' : 'false'); });
+    gh.hidden = k !== 'github'; az.hidden = k !== 'azure';
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-p')); }); });
+  show('github');
 })();
 </script>
 </body>
