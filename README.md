@@ -13,6 +13,7 @@ Interactive walkthroughs and reference pages that explain how Maia works, how it
 | **[Maia star schema build flow](https://garniebolling-maia.github.io/additional-assets/maia-star-schema-build-flow.html)** | How Maia fits around an existing star schema, from your design through loaded, scheduled and monitored dimensions and facts. | Data engineers and modelers |
 | **[From Matillion ETL to Maia](https://garniebolling-maia.github.io/additional-assets/maia-matillion-etl-to-maia.html)** | A guided path for Matillion ETL customers: what carries over, what changes, and where Maia Team helps, from concept mapping through the Upgrade Assistant, validation and release. | Matillion ETL customers |
 | **[Maia whiteboard](https://garniebolling-maia.github.io/additional-assets/maia-whiteboard-sketch.html)** | A hand-drawn style whiteboard for live conversations. It builds from the pre-AI enterprise data team to the digital data team using the Maia icon set, with a copilot objection step, a demonstration or workshop close, and a separate presenter window for notes. | Presales and solution teams |
+| **[Maia MCP](https://garniebolling-maia.github.io/additional-assets/maia-mcp-explorer.html)** | Interactive tour of the Maia MCP server: ask questions, explore its 68 tools, connect other systems, and learn the limits. | Presales and solution teams |
 
 ## Using the pages
 
