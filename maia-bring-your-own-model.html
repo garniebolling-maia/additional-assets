@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bring your own model or stack: how Maia fits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,600&display=swap" rel="stylesheet">
+<style>
+/* Matillion / Maia brand tokens and base styles (2026 guidelines). */
+:root {
+  /* Greens */
+  --green-900: #002e2b; --green-700: #20514e; --green-500: #477a75;
+  --teal-300: #87c7c0; --teal-200: #b7ddd9; --teal-100: #cfe9e6; --teal-50: #e7f4f2;
+  /* Yellows */
+  --yellow-900: #4d3400; --yellow-700: #9a6700; --yellow-500: #ffc000;
+  --yellow-400: #ffcd33; --yellow-300: #ffd966; --yellow-200: #ffe699; --yellow-100: #fff2cc;
+  --cream: #fffae9;
+  /* Blues (supporting) */
+  --blue-950: #031c33; --blue-900: #004a6b; --blue-700: #007ca5; --blue-400: #7dd0f4;
+  --blue-300: #b1e3f8; --blue-200: #cbecfb; --blue-100: #e5f6fd;
+  /* Greys */
+  --grey-800: #333333; --grey-700: #4d4d4d; --grey-500: #808080; --grey-400: #b3b3b3;
+  --grey-300: #d1d1d1; --grey-200: #e1e1e1; --grey-100: #f0f0f0;
+
+  /* Semantic */
+  --bg: #ffffff; --bg-soft: var(--cream); --surface: var(--grey-100);
+  --text: var(--green-900); --text-2: var(--green-700); --text-muted: var(--grey-700);
+  --accent: var(--yellow-500); --accent-text: var(--yellow-700);
+  --rule: var(--grey-200);
+
+  --font-sans: 'Inter', Arial, Helvetica, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --radius: 10px;
+  --chart-1: #002e2b; --chart-2: #ffc000; --chart-3: #477a75; --chart-4: #007ca5;
+  --chart-5: #87c7c0; --chart-6: #ffd966; --chart-7: #7dd0f4; --chart-8: #808080;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg-soft); color: var(--text); font-family: var(--font-sans); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+/* Headline pairing: serif setup + Inter Bold punch */
+.display { font-size: clamp(36px, 6vw, 60px); line-height: 1.08; margin: 0; letter-spacing: -0.02em; color: var(--green-900); }
+.display .serif, .serif { font-family: var(--font-serif); font-weight: 300; letter-spacing: -0.01em; }
+.display .bold { font-family: var(--font-sans); font-weight: 700; display: block; }
+em.accent, .accent-italic { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent-text); }
+.on-dark em.accent, .on-dark .accent-italic { color: var(--yellow-500); }
+
+h1, h2, h3 { font-family: var(--font-sans); color: var(--green-900); letter-spacing: -0.01em; margin: 0 0 .5em; }
+h1 { font-size: clamp(32px, 4.5vw, 48px); font-weight: 700; line-height: 1.1; }
+h2 { font-size: clamp(24px, 3vw, 30px); font-weight: 700; line-height: 1.2; }
+h3 { font-size: 20px; font-weight: 600; line-height: 1.3; }
+p { margin: 0 0 1em; }
+.lede { font-family: var(--font-serif); font-weight: 300; font-size: 22px; line-height: 1.4; color: var(--green-700); }
+.tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--grey-500); font-weight: 500; }
+
+/* Page furniture */
+.topbar { display: flex; align-items: center; gap: 10px; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.topbar img, .topbar svg { height: 22px; width: auto; }
+.topbar .page { margin-left: auto; }
+
+/* Panels */
+.hero { background: var(--green-900); color: #fff; padding: 56px 0 64px; }
+.hero .display, .hero h1, .hero h2 { color: #fff; }
+.hero .lede { color: var(--teal-200); }
+.hero .logo svg, .hero .logo img { height: 56px; width: auto; }
+.band-yellow { background: var(--yellow-400); color: var(--green-900); }
+.on-dark { color: #fff; }
+
+/* Cards, grids */
+.grid { display: grid; gap: 16px; }
+.grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.card { background: var(--surface); border-radius: var(--radius); padding: 20px 22px; }
+.card.teal { background: var(--teal-50); }
+.card.yellow { background: var(--yellow-100); }
+.card.dark { background: var(--green-700); color: #fff; }
+.card h3 { margin-bottom: .35em; }
+
+/* KPI */
+.kpi { background: #fff; border-radius: var(--radius); padding: 18px 20px; border: 1px solid var(--rule); }
+.kpi .label { font-size: 12px; color: var(--grey-700); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
+.kpi .value { font-size: 34px; font-weight: 700; line-height: 1.1; color: var(--green-900); margin-top: 4px; }
+.kpi .delta { font-size: 13px; color: var(--green-500); margin-top: 2px; }
+.kpi .delta.down { color: var(--yellow-700); }
+
+/* Buttons / chips */
+.btn { display: inline-block; background: var(--yellow-500); color: var(--green-900); font-weight: 600; padding: 12px 20px; border-radius: 8px; text-decoration: none; }
+.btn.secondary { background: transparent; border: 1.5px solid var(--green-900); }
+.chip { display: inline-block; background: var(--teal-100); color: var(--green-900); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.chip.yellow { background: var(--yellow-100); color: var(--yellow-900); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th { background: var(--green-900); color: #fff; text-align: left; font-weight: 600; padding: 10px 14px; }
+tbody td { padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+tbody tr:nth-child(even) td { background: var(--grey-100); }
+
+/* Sections */
+section { padding: 40px 0; }
+footer.site { padding: 28px 0 40px; color: var(--grey-700); font-size: 13px; border-top: 1px solid var(--rule); }
+
+@media (max-width: 640px) { .wrap { padding: 0 16px; } .hero { padding: 40px 0 48px; } }
+
+
+:root{
+  --page:#fffae9; --ink:#002e2b; --ink-2:#20514e; --muted:#4d4d4d;
+  --card:#ffffff; --card-line:#e1e1e1;
+  --good:#e7f4f2; --good-ink:#002e2b; --mark:#477a75;
+  --soft:#fff2cc; --soft-ink:#4d3400;
+  --band:#ffcd33; --band-ink:#002e2b;
+  --th-bg:#002e2b; --th-ink:#ffffff; --stripe:#f0f0f0;
+  --accent-ink:#9a6700;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#002e2b; --ink:#ffffff; --ink-2:#b7ddd9; --muted:#cfe9e6;
+    --card:#20514e; --card-line:#477a75;
+    --good:#20514e; --good-ink:#ffffff; --mark:#87c7c0;
+    --soft:#4d3400; --soft-ink:#fff2cc;
+    --th-bg:#ffc000; --th-ink:#002e2b; --stripe:#1b4744;
+    --accent-ink:#ffc000;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#002e2b; --ink:#ffffff; --ink-2:#b7ddd9; --muted:#cfe9e6;
+  --card:#20514e; --card-line:#477a75;
+  --good:#20514e; --good-ink:#ffffff; --mark:#87c7c0;
+  --soft:#4d3400; --soft-ink:#fff2cc;
+  --th-bg:#ffc000; --th-ink:#002e2b; --stripe:#1b4744;
+  --accent-ink:#ffc000;
+}
+:root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+body{ background:var(--page); color:var(--ink); }
+h1,h2,h3{ color:var(--ink); }
+em.accent{ color:var(--accent-ink); }
+.hero{ background:#002e2b; }
+.hero h1,.hero .display{ color:#fff; }
+.hero em.accent{ color:#ffc000; }
+.tag{ color:var(--muted); }
+section{ padding:36px 0; }
+.rule{ border:0; border-top:1px solid var(--card-line); margin:0; }
+.lead{ font-family:var(--font-serif); font-weight:300; font-size:20px; line-height:1.45; color:var(--ink-2); max-width:740px; }
+.note{ font-size:14px; color:var(--muted); }
+
+.box{ background:var(--card); border:1px solid var(--card-line); border-radius:10px; padding:20px 22px; }
+.box h3{ margin-bottom:.4em; }
+.box p:last-child{ margin-bottom:0; }
+.box .tag{ margin:12px 0 4px; }
+.box.tint{ background:var(--good); color:var(--good-ink); border-color:transparent; }
+.box.tint h3{ color:var(--good-ink); }
+.box.warm{ background:var(--soft); color:var(--soft-ink); border-color:transparent; }
+.box.warm h3{ color:var(--soft-ink); }
+.box ul{ margin:8px 0 0; padding-left:18px; }
+.box li{ margin-bottom:6px; }
+
+.steps{ counter-reset:s; display:grid; gap:12px; }
+.step{ display:grid; grid-template-columns:44px 1fr; gap:14px; background:var(--card); border:1px solid var(--card-line); border-radius:10px; padding:14px 18px; }
+.step::before{ counter-increment:s; content:counter(s); width:36px; height:36px; border-radius:50%; background:#ffc000; color:#002e2b; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.step h3{ font-size:17px; margin:0 0 2px; }
+.step p{ margin:0; font-size:15px; }
+
+.flow{ display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:12px; align-items:stretch; }
+.flow .node{ background:var(--card); border:1px solid var(--card-line); border-radius:10px; padding:18px 20px; }
+.flow .node.bridge{ background:#ffc000; border-color:#ffc000; color:#002e2b; }
+.flow .node.bridge h3, .flow .node.bridge .tag{ color:#002e2b; }
+.flow ul{ margin:8px 0 0; padding-left:18px; font-size:14.5px; }
+.flow li{ margin-bottom:4px; }
+.flow .arrow{ align-self:center; font-size:26px; color:var(--ink-2); font-weight:300; }
+@media (max-width:860px){ .flow{ grid-template-columns:1fr; } .flow .arrow{ transform:rotate(90deg); justify-self:center; } }
+
+.tablewrap{ overflow-x:auto; border-radius:10px; border:1px solid var(--card-line); background:var(--card); }
+table{ min-width:640px; }
+thead th{ background:var(--th-bg); color:var(--th-ink); }
+tbody td{ color:var(--ink); vertical-align:top; border-bottom:1px solid var(--card-line); }
+tbody tr:nth-child(even) td{ background:var(--stripe); }
+td.k{ font-weight:600; }
+
+.band{ background:var(--band); color:var(--band-ink); border-radius:14px; padding:28px 32px; margin-top:24px; }
+.band h2{ color:#002e2b; margin-bottom:.3em; }
+.band p{ margin:0; font-size:18px; max-width:760px; }
+.band em.accent{ color:#4d3400; }
+.band .tag{ color:#002e2b; }
+.qlist{ margin:0; padding-left:20px; }
+.qlist li{ margin-bottom:8px; }
+footer.site{ color:var(--muted); border-top:1px solid var(--card-line); }
+
+/* ---- Architecture diagram ---- */
+.archwrap{ background:var(--card); border:1px solid var(--card-line); border-radius:12px; padding:12px; }
+.arch{ width:100%; height:auto; display:block; }
+.arch .zone-m{ fill:var(--good); stroke:var(--mark); stroke-width:1.5; stroke-dasharray:6 5; }
+.arch .zone-y{ fill:none; stroke:var(--mark); stroke-width:1.5; stroke-dasharray:6 5; }
+.arch .n{ fill:var(--card); stroke:var(--card-line); stroke-width:1.2; }
+.arch .ny{ fill:#ffc000; stroke:#ffc000; }
+.arch .t{ fill:var(--ink); font:600 15px var(--font-sans); }
+.arch .s{ fill:var(--muted); font:400 12.5px var(--font-sans); }
+.arch .z{ fill:var(--ink-2); font:600 11.5px var(--font-sans); letter-spacing:.1em; }
+.arch .ty{ fill:#002e2b; font:600 15px var(--font-sans); }
+.arch .sy{ fill:#002e2b; font:400 12.5px var(--font-sans); }
+.arch .ln{ stroke:var(--ink-2); stroke-width:1.8; fill:none; }
+.arch .hd{ fill:var(--ink-2); }
+.arch .bd{ fill:#ffc000; stroke:#002e2b; stroke-width:1.2; }
+.arch .bn{ fill:#002e2b; font:700 13px var(--font-sans); text-anchor:middle; }
+.arch-steps .box{ padding:14px 16px; font-size:15px; }
+.arch-steps .box h3{ font-size:16px; margin-bottom:.25em; }
+body.presenting .archwrap svg{ max-height:46vh; }
+/* ---- Presentation mode ---- */
+#presentBtn{ position:fixed; top:calc(12px + env(safe-area-inset-top,0px)); right:16px; z-index:15; background:#ffc000; color:#002e2b; border:0; border-radius:8px; padding:10px 18px; font:600 14px var(--font-sans); cursor:pointer; }
+#presentBtn:hover{ background:#ffcd33; }
+#presBar,#presProg{ display:none; }
+body.presenting{ overflow:hidden; }
+body.presenting #presentBtn{ display:none; }
+body.presenting hr.rule, body.presenting footer.site{ display:none; }
+body.presenting header.hero, body.presenting main > section{ display:none; }
+body.presenting .slide.active{ display:flex; flex-direction:column; position:fixed; inset:0; z-index:20; overflow-y:auto; background:var(--page); padding:56px max(5vw, calc((100vw - 1120px) / 2)) 96px; font-size:18px; }
+body.presenting header.hero.active{ background:#002e2b; }
+body.presenting .slide.active > :first-child{ margin-top:auto; }
+body.presenting .slide.active > :last-child{ margin-bottom:auto; }
+body.presenting header.hero.active > .wrap{ margin:auto; width:100%; max-width:1120px; padding:0; }
+body.presenting .slide.active h2{ font-size:clamp(28px, 3.6vw, 44px); }
+body.presenting .slide.active .lead{ font-size:clamp(18px, 2vw, 24px); }
+@media (max-width:760px){ body.presenting .slide.active{ padding:48px 20px 96px; font-size:16px; } }
+#presProg{ position:fixed; top:0; left:0; height:4px; width:0; background:#ffc000; z-index:40; transition:width .2s ease; }
+body.presenting #presProg{ display:block; }
+#presBar{ position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:40; align-items:center; gap:6px; background:#002e2b; color:#fff; border:1px solid #477a75; border-radius:999px; padding:6px 8px; font:500 14px var(--font-sans); }
+body.presenting #presBar{ display:flex; }
+#presBar button{ background:transparent; color:#fff; border:0; border-radius:999px; padding:8px 14px; font:600 14px var(--font-sans); cursor:pointer; }
+#presBar button:hover{ background:#20514e; }
+#presBar #pNext{ background:#ffc000; color:#002e2b; }
+#presBar #pNext:hover{ background:#ffcd33; }
+#presBar #pCount{ min-width:64px; text-align:center; color:#b7ddd9; }
+#presMenu{ display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:calc(72px + env(safe-area-inset-bottom,0px)); z-index:45; width:min(460px, calc(100vw - 32px)); max-height:60vh; overflow-y:auto; background:#002e2b; color:#fff; border:1px solid #477a75; border-radius:14px; padding:8px; }
+body.presenting #presMenu.open{ display:block; }
+#presMenu button{ display:grid; grid-template-columns:32px 1fr; width:100%; text-align:left; background:transparent; color:#fff; border:0; border-radius:8px; padding:10px 12px; font:500 15px var(--font-sans); cursor:pointer; }
+#presMenu button:hover, #presMenu button.cur{ background:#20514e; }
+#presMenu .pn{ color:#ffc000; font-weight:700; }
+@media print{ #presentBtn,#presBar,#presProg{ display:none !important; } body{ background:#fff; } .hero{ -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+</style>
+</head>
+<body>
+<button id="presentBtn" type="button" aria-label="Start presentation mode">Present</button>
+<div id="presProg"></div>
+<div id="presMenu" role="menu" aria-label="Jump to slide"></div>
+<div id="presBar" role="toolbar" aria-label="Presentation controls"><button id="pPrev" type="button" aria-label="Previous slide">←</button><span id="pCount"></span><button id="pNext" type="button" aria-label="Next slide">→</button><button id="pMenu" type="button" aria-haspopup="true">Slides</button><button id="pFs" type="button">Full screen</button><button id="pExit" type="button">Exit</button></div>
+
+<header class="hero on-dark">
+  <div class="wrap">
+    <div class="logo"><svg style="height:56px;width:auto" role="img" aria-label="Maia by Matillion" id="maia_by_matillion_on_dark_Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 518.27 246.95"><defs><style>.maia_by_matillion_on_dark_cls-1 {fill: url(#maia_by_matillion_on_dark_linear-gradient-5);}.maia_by_matillion_on_dark_cls-2 {fill: url(#maia_by_matillion_on_dark_linear-gradient-6);}.maia_by_matillion_on_dark_cls-3 {fill: url(#maia_by_matillion_on_dark_linear-gradient-4);}.maia_by_matillion_on_dark_cls-4 {fill: url(#maia_by_matillion_on_dark_linear-gradient-3);}.maia_by_matillion_on_dark_cls-5 {fill: url(#maia_by_matillion_on_dark_linear-gradient-2);}.maia_by_matillion_on_dark_cls-6 {fill: url(#maia_by_matillion_on_dark_linear-gradient);}.maia_by_matillion_on_dark_cls-7 {fill: #b7ddd9;}.maia_by_matillion_on_dark_cls-8 {fill: #fff;}</style><linearGradient id="maia_by_matillion_on_dark_linear-gradient" x1="101.07" y1="236.66" x2="172.31" y2="291.93" gradientTransform="translate(0 274.96) scale(1 -1)" gradientUnits="userSpaceOnUse"><stop offset=".33" stop-color="#fff"/><stop offset=".41" stop-color="#fff" stop-opacity=".98"/><stop offset=".5" stop-color="#fff" stop-opacity=".92"/><stop offset=".61" stop-color="#fff" stop-opacity=".83"/><stop offset=".72" stop-color="#fff" stop-opacity=".7"/><stop offset=".78" stop-color="#fff" stop-opacity=".6"/></linearGradient><linearGradient id="maia_by_matillion_on_dark_linear-gradient-2" x1="-17.46" y1="225.59" x2="69.13" y2="290.38" xlink:href="#maia_by_matillion_on_dark_linear-gradient"/><linearGradient id="maia_by_matillion_on_dark_linear-gradient-3" x1="86.54" y1="76.46" x2="167.89" y2="160.33" xlink:href="#maia_by_matillion_on_dark_linear-gradient"/><linearGradient id="maia_by_matillion_on_dark_linear-gradient-4" x1="17.15" y1="151.28" x2="77" y2="211.54" xlink:href="#maia_by_matillion_on_dark_linear-gradient"/><linearGradient id="maia_by_matillion_on_dark_linear-gradient-5" x1="65.81" y1="164.5" x2="117.23" y2="226.03" gradientTransform="translate(0 274.96) scale(1 -1)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset=".13" stop-color="#fff" stop-opacity=".98"/><stop offset=".28" stop-color="#fff" stop-opacity=".92"/><stop offset=".44" stop-color="#fff" stop-opacity=".83"/><stop offset=".61" stop-color="#fff" stop-opacity=".7"/><stop offset=".72" stop-color="#fff" stop-opacity=".6"/></linearGradient><linearGradient id="maia_by_matillion_on_dark_linear-gradient-6" x1="-45.54" y1="9155.52" x2="169.12" y2="8953.96" gradientTransform="translate(0 -8931.0601)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#a76227"/><stop offset=".09" stop-color="#be7822"/><stop offset=".22" stop-color="#d8911c"/><stop offset=".35" stop-color="#eba219"/><stop offset=".49" stop-color="#f6ad16"/><stop offset=".63" stop-color="#fab116"/><stop offset="1" stop-color="#ffecbe"/></linearGradient></defs><g><g><path class="maia_by_matillion_on_dark_cls-7" d="M218.17,228.17c-1.52,0-2.81-.28-3.81-.86-1.04-.58-1.87-1.29-2.51-2.15s-1.12-1.68-1.45-2.51h-.33v4.95h-2.99v-35.22h3.07v13.88h.25c.33-.79.83-1.62,1.44-2.44.63-.83,1.45-1.54,2.48-2.11s2.31-.86,3.88-.86c2.1,0,3.9.58,5.46,1.7,1.57,1.12,2.77,2.72,3.65,4.79s1.32,4.42,1.32,7.18-.45,5.13-1.32,7.2-2.1,3.65-3.65,4.8-3.38,1.7-5.46,1.7v-.08l-.02.02ZM217.79,225.26c1.68,0,3.07-.46,4.21-1.44,1.16-.96,2.01-2.26,2.61-3.9.61-1.65.91-3.47.91-5.5s-.3-3.81-.88-5.45-1.45-2.89-2.61-3.85-2.56-1.44-4.23-1.44-3.02.46-4.18,1.37-2.01,2.18-2.61,3.8c-.61,1.6-.91,3.47-.91,5.55s.3,3.96.91,5.58,1.49,2.91,2.64,3.85c1.16.94,2.53,1.4,4.14,1.4h0l-.02.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M232.23,237.13l.86-2.77.36.12c.91.28,1.7.36,2.44.25.74-.12,1.4-.5,2.01-1.16.58-.66,1.11-1.6,1.52-2.86l.99-2.89-9.76-26.63h3.35l5.86,16.61c.54,1.52,1.02,3.02,1.44,4.51s.83,2.94,1.24,4.39h-1.11c.45-1.44.88-2.91,1.29-4.39s.88-2.99,1.44-4.47l5.88-16.61h3.35l-11.28,30.73c-.5,1.32-1.07,2.39-1.73,3.24s-1.44,1.49-2.31,1.9-1.85.63-2.91.63c-.63,0-1.19-.05-1.7-.17s-.94-.25-1.24-.38l.03-.03h-.03Z"/></g><g><path class="maia_by_matillion_on_dark_cls-7" d="M325.36,195.2l-20.59-11.87c-2.66-1.54-5.96-1.54-8.63,0l-20.59,11.87c-2.66,1.54-4.31,4.39-4.31,7.48v23.77c0,3.07,1.65,5.94,4.31,7.48l20.59,11.87c2.66,1.54,5.96,1.54,8.63,0l20.59-11.87c2.66-1.54,4.31-4.39,4.31-7.48v-23.77c0-3.07-1.65-5.94-4.31-7.48ZM280.84,229.06c-.86,0-1.73-.3-2.44-.91-1.57-1.35-1.73-3.71-.38-5.28l19.65-22.68c1.35-1.57,3.71-1.73,5.25-.38,1.57,1.35,1.73,3.71.38,5.25l-19.65,22.68c-.74.86-1.78,1.29-2.82,1.29h0l.03.03h-.02ZM322.56,228.17c-.71.61-1.57.91-2.43.91-1.04,0-2.1-.45-2.82-1.29l-9.39-11-9.39,11c-.74.86-1.78,1.29-2.82,1.29-.86,0-1.73-.3-2.43-.91-1.57-1.35-1.77-3.68-.41-5.25l12.15-14.22s.05-.08.12-.12l.25-.25s.03-.03.05-.05c.08-.08.2-.17.3-.25h0s.12-.08.17-.12.12-.08.17-.12h0c.17-.08.36-.2.53-.25.05,0,.13-.05.2-.05s.08-.03.13-.05c.08,0,.17-.05.25-.05.05,0,.13,0,.2-.03h1.16s.13,0,.2.03c.05,0,.12,0,.2.05h.08s.08,0,.12.03c.05,0,.12.03.17.05h.05s.12.05.17.08c.25.12.5.25.71.41.05.03.08.08.13.12.05.05.12.08.17.13s.12.08.13.13c.05.05.08.12.13.17,0,0,.03.03.05.05l12.2,14.23c1.35,1.57,1.16,3.93-.41,5.25h0l-.03.03v.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.06,208.6h0s-.05.05-.12.08l.08-.08h.03Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.39,208.31s-.03.03-.05.05c0,0,.03-.03.05-.05Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.32,208.32l-.25.25.25-.25Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M305.65,208.06s-.2.17-.3.25c.03-.03.05-.05.08-.08.05-.05.13-.12.2-.17h.03-.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M306.02,207.81c.17-.12.36-.2.53-.25-.2.08-.36.17-.53.25Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M310.32,208.19l.12.12s-.12-.08-.17-.13l.03.03h.03l-.02-.02Z"/></g><g><path class="maia_by_matillion_on_dark_cls-7" d="M347.08,227.67v-26.53h4.79l.13,6.16h-.38c.36-1.52.94-2.74,1.68-3.71.78-.96,1.65-1.68,2.66-2.18,1.01-.5,2.1-.71,3.19-.71,1.87,0,3.35.61,4.51,1.78s1.9,2.86,2.31,5h-.63c.33-1.45.91-2.69,1.73-3.71s1.82-1.78,2.97-2.31,2.43-.79,3.73-.79c1.52,0,2.86.33,4.09,1.02,1.24.69,2.2,1.7,2.91,3.05s1.07,3.02,1.07,5.04v17.9h-5.04v-17.37c0-1.77-.46-3.05-1.44-3.85-.96-.79-2.06-1.19-3.38-1.19-1.04,0-1.95.21-2.72.69s-1.35,1.11-1.77,1.9c-.41.83-.61,1.77-.61,2.81v16.99h-4.95v-17.7c0-1.44-.45-2.56-1.32-3.4-.88-.86-1.98-1.29-3.35-1.29-.94,0-1.78.21-2.58.69-.79.45-1.44,1.12-1.93,2.01s-.71,1.95-.71,3.24v16.49h-5.04.03l.03-.03Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M394.61,228.28c-1.62,0-3.07-.3-4.38-.94-1.3-.64-2.34-1.54-3.1-2.74s-1.16-2.66-1.16-4.42c0-1.52.28-2.74.83-3.71.54-.96,1.32-1.73,2.26-2.31.96-.58,2.01-.99,3.15-1.29s2.34-.5,3.55-.63c1.52-.2,2.72-.33,3.68-.46s1.65-.33,2.1-.61.66-.71.66-1.35v-.13c0-.99-.2-1.85-.54-2.53s-.91-1.21-1.62-1.57-1.62-.54-2.69-.54-2.06.17-2.86.53-1.45.79-1.95,1.37c-.5.54-.86,1.12-1.11,1.73l-4.72-1.29c.58-1.6,1.4-2.86,2.48-3.81s2.31-1.68,3.71-2.11,2.86-.66,4.34-.66c1.04,0,2.11.13,3.3.38,1.16.25,2.26.71,3.27,1.37s1.85,1.6,2.48,2.81.96,2.77.96,4.71v17.62h-4.87v-3.63h-.25c-.33.69-.83,1.35-1.49,2.01s-1.49,1.19-2.48,1.6-2.2.63-3.57.63l.03.03-.03-.03ZM395.73,224.07c1.37,0,2.53-.28,3.52-.83.96-.54,1.73-1.29,2.23-2.2.53-.91.78-1.9.78-2.91v-3.38c-.2.2-.53.36-1.04.53s-1.11.28-1.77.41c-.66.12-1.29.21-1.9.3s-1.11.13-1.52.2c-.94.13-1.82.33-2.58.63s-1.4.71-1.87,1.29c-.46.54-.69,1.29-.69,2.2,0,.83.21,1.54.63,2.11s.99.99,1.7,1.29c.71.28,1.54.45,2.48.45l.03-.08Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M423.67,201.16v4.23h-13.82v-4.23h13.82ZM413.54,194.83h5.04v25.67c0,1.07.21,1.85.66,2.34s1.16.74,2.15.74c.25,0,.61-.03,1.02-.08s.79-.13,1.11-.2l.88,4.18c-.53.2-1.11.33-1.7.41s-1.21.13-1.82.13c-2.31,0-4.09-.63-5.38-1.87s-1.93-2.99-1.93-5.22v-26.12h-.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M429.96,197.08c-.88,0-1.62-.3-2.23-.91s-.94-1.35-.94-2.18.3-1.6.94-2.2c.61-.61,1.35-.91,2.23-.91s1.62.3,2.23.91.94,1.35.94,2.2-.3,1.6-.94,2.18-1.37.91-2.23.91ZM427.43,227.67v-26.53h5.04v26.53h-5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M443.11,192.32v35.35h-5.04v-35.35h5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M453.78,192.32v35.35h-5.04v-35.35h5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M461.92,197.08c-.88,0-1.62-.3-2.23-.91s-.94-1.35-.94-2.18.3-1.6.94-2.2c.61-.61,1.35-.91,2.23-.91s1.62.3,2.23.91.94,1.35.94,2.2-.3,1.6-.94,2.18-1.37.91-2.23.91ZM459.39,227.67v-26.53h5.04v26.53h-5.04Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M480.61,228.23c-2.39,0-4.47-.58-6.27-1.7-1.78-1.16-3.19-2.74-4.18-4.79-.99-2.05-1.49-4.46-1.49-7.18s.5-5.17,1.49-7.23c.99-2.06,2.36-3.65,4.18-4.8,1.78-1.16,3.88-1.7,6.27-1.7s4.51.58,6.29,1.7c1.78,1.12,3.19,2.74,4.18,4.8s1.49,4.47,1.49,7.23-.5,5.12-1.49,7.18c-.99,2.06-2.39,3.65-4.18,4.79-1.78,1.14-3.88,1.7-6.29,1.7ZM480.61,223.82c1.54,0,2.82-.41,3.85-1.27s1.77-1.98,2.26-3.38.74-2.94.74-4.62-.25-3.24-.74-4.67-1.24-2.56-2.26-3.4c-1.02-.86-2.28-1.27-3.85-1.27s-2.81.41-3.81,1.27c-1.02.86-1.77,1.98-2.26,3.38s-.74,2.97-.74,4.67.25,3.22.74,4.62,1.24,2.53,2.26,3.38c1.02.86,2.28,1.27,3.81,1.27v.03-.02Z"/><path class="maia_by_matillion_on_dark_cls-7" d="M501.94,211.99v15.72h-5.04v-26.53h4.79l.05,6.52h-.53c.74-2.36,1.82-4.09,3.24-5.2s3.14-1.65,5.13-1.65c1.73,0,3.24.38,4.54,1.12,1.29.78,2.31,1.87,3.02,3.35.74,1.49,1.11,3.32,1.11,5.53v16.86h-5.04v-16.21c0-1.93-.46-3.4-1.44-4.47-.96-1.07-2.28-1.62-3.96-1.62-1.12,0-2.15.25-3.02.78-.91.53-1.6,1.27-2.11,2.26s-.78,2.18-.78,3.57h0l.03-.02Z"/></g></g><g id="maia_by_matillion_on_dark_Layer_1-2" data-name="Layer 1"><g id="maia_by_matillion_on_dark_uuid-2b5aae4b-3a3c-4460-ab90-146e7e1a8611" data-name="Layer 1-2"><g><g><g><path class="maia_by_matillion_on_dark_cls-6" d="M131.53,13.19l-1.5,2.45c-.84,1.38-.39,3.17,1.01,3.98l2.25,1.29c1.35.78,3.07.34,3.87-.98l1.47-2.4,3.78.09c.93.02,1.78-.45,2.26-1.23l3.71-6.05c.48-.78.51-1.77.07-2.57l-3.39-6.25c-.43-.81-1.28-1.33-2.19-1.35L135.76,0c-.93-.02-1.78.45-2.26,1.23l-3.71,6.05c-.48.78-.51,1.77-.07,2.57l1.8,3.32h.01s-.01.01-.01.01Z"/><path class="maia_by_matillion_on_dark_cls-5" d="M27.84,16.54c.48.78,1.34,1.25,2.26,1.23l3.78-.09,1.41,2.3c.82,1.33,2.54,1.77,3.87.98l2.25-1.29c1.4-.81,1.85-2.61,1.01-3.98l-1.45-2.36,1.8-3.32c.43-.81.41-1.79-.07-2.57l-3.71-6.05c-.48-.78-1.34-1.25-2.26-1.23l-7.09.19c-.93.02-1.75.53-2.19,1.35l-3.39,6.25c-.43.81-.41,1.79.07,2.57l3.71,6.05v-.02h0Z"/></g><path class="maia_by_matillion_on_dark_cls-4" d="M130.58,125.52l-1.03-2.7c-4.81,14.85-16.49,26.53-31.34,31.34,14.85,4.8,26.58,16.58,31.34,31.34,4.75-14.75,16.56-26.59,31.34-31.34-13.84-4.56-25.18-14.95-30.33-28.65h.01s0,0,0,0Z"/><path class="maia_by_matillion_on_dark_cls-3" d="M50.45,74.31h0c4.98,0,9.01,4.04,9.01,9.02v13.65c0,4.98-4.04,9.02-9.01,9.02h0c-4.98,0-9.01-4.04-9.01-9.02v-13.65c0-4.98,4.04-9.02,9.01-9.02Z"/><path class="maia_by_matillion_on_dark_cls-1" d="M82.78,74.31h0c4.98,0,9.01,4.04,9.01,9.02v13.65c0,4.98-4.04,9.02-9.01,9.02h0c-4.98,0-9.01-4.04-9.01-9.02v-13.65c0-4.98,4.04-9.02,9.01-9.02Z"/><path class="maia_by_matillion_on_dark_cls-2" d="M155.42,44.79l-51.9-29.97c-10.62-6.12-23.79-6.12-34.41,0l-51.9,29.97C6.59,50.92,0,62.33,0,74.59v59.94c0,12.25,6.59,23.67,17.21,29.8l51.9,29.97c5.31,3.06,11.26,4.6,17.21,4.6s11.89-1.53,17.21-4.6l9.26-5.34s-.02-.01-.04-.02c3.79-2.5,5.03-7.55,2.74-11.53l-.93-1.59h0c-3.37-4.91-8.04-8.83-13.53-11.29-4.36-1.95-9.4-1.67-13.53.71h0c-5.48,3.17-12.25,3.17-17.74,0l-42.35-24.46c-5.48-3.17-8.86-9.03-8.86-15.36v-48.9c0-6.34,3.38-12.19,8.86-15.36l42.35-24.44c5.48-3.17,12.25-3.17,17.74,0l42.35,24.44c5.48,3.17,8.86,9.03,8.86,15.36v39.4c0,15.62,12.77,28.39,28.39,28.39h.64c2.7,0,4.91-2.1,4.91-4.66h0v-65.06c0-12.25-6.59-23.67-17.21-29.8h0Z"/></g><path class="maia_by_matillion_on_dark_cls-8" d="M271.76,112.6c-.68,1.93-1.47,4.42-2.35,7.47s-1.79,6.3-2.72,9.75c-.93,3.46-1.81,6.85-2.65,10.18-.14.57-.27,1.11-.41,1.63-.16-.63-.31-1.25-.47-1.91-.83-3.35-1.7-6.75-2.65-10.22-.93-3.46-1.83-6.66-2.68-9.61s-1.63-5.38-2.31-7.32l-23.83-65.17h-24.64v113.58h16.27v-61.13c0-2.49-.04-5.4-.11-8.73s-.14-6.85-.23-10.56c-.07-3.71-.14-7.38-.23-11.02-.04-1.63-.07-3.17-.11-4.69.63,2.12,1.27,4.24,1.9,6.36,1.18,3.94,2.32,7.73,3.45,11.35,1.13,3.64,2.17,6.93,3.12,9.9.95,2.97,1.8,5.43,2.52,7.36l22.65,61.13h14.29l22.36-61.13c.68-1.98,1.53-4.48,2.52-7.52,1-3.02,2.05-6.36,3.15-10.03,1.11-3.66,2.22-7.45,3.38-11.4.65-2.24,1.27-4.42,1.86-6.59-.04,1.88-.07,3.81-.11,5.78-.07,3.71-.14,7.38-.23,11.02-.07,3.64-.13,7.07-.18,10.33-.05,3.24-.07,6.05-.07,8.39v61.13h16.63V47.43h-24.78l-23.46,65.17h.06s.01,0,.01,0ZM391.62,80.35c-3.27-2.13-6.77-3.6-10.49-4.42-3.72-.82-7.23-1.22-10.56-1.22-4.78,0-9.43.71-13.93,2.13s-8.49,3.69-11.94,6.79c-3.47,3.1-6.14,7.19-7.99,12.28l15.18,4.11c.78-1.93,1.97-3.78,3.56-5.57,1.59-1.78,3.66-3.24,6.23-4.39,2.57-1.15,5.63-1.72,9.2-1.72s6.36.59,8.68,1.79c2.32,1.2,4.06,2.88,5.24,5.07,1.18,2.18,1.77,4.88,1.77,8.08v.46c0,1.98-.72,3.42-2.17,4.3-1.45.89-3.67,1.53-6.71,1.91-3.03.38-6.97.88-11.8,1.48-3.86.46-7.67,1.15-11.4,2.06-3.74.91-7.13,2.29-10.19,4.11-3.06,1.83-5.48,4.29-7.25,7.39-1.79,3.1-2.68,7.06-2.68,11.89,0,5.59,1.22,10.32,3.66,14.18,2.44,3.86,5.77,6.8,9.97,8.81,4.21,2,8.9,3.01,14.08,3.01,4.44,0,8.27-.68,11.47-2.02,3.2-1.35,5.85-3.06,7.95-5.14,2.1-2.08,3.69-4.22,4.76-6.4h.81v11.66h15.62v-56.56c0-6.2-1.03-11.23-3.08-15.09-2.05-3.86-4.71-6.86-7.99-8.99h.01s-.01,0-.01,0ZM386.63,130.29c0,3.31-.83,6.43-2.49,9.38-1.66,2.95-4.05,5.31-7.18,7.09s-6.89,2.67-11.29,2.67c-3.03,0-5.7-.46-7.99-1.38-2.3-.91-4.12-2.29-5.46-4.11-1.35-1.83-2.02-4.09-2.02-6.78,0-2.95.75-5.31,2.24-7.09s3.49-3.15,6.01-4.11c2.51-.96,5.28-1.65,8.32-2.06,1.27-.16,2.88-.36,4.83-.61,1.95-.25,3.98-.57,6.09-.95,2.1-.38,3.97-.82,5.6-1.29,1.63-.48,2.75-1.03,3.33-1.63v10.9h0s0-.01,0-.01ZM420.64,161h16.13v-85.22h-16.13v85.22ZM428.77,42.86c-2.79,0-5.17.96-7.14,2.89-1.98,1.93-2.97,4.29-2.97,7.09s1,5.03,2.97,6.98c1.98,1.95,4.36,2.94,7.14,2.94s5.18-.96,7.18-2.89c2-1.93,3.01-4.26,3.01-7.02s-1.01-5.16-3.01-7.09c-2-1.93-4.4-2.89-7.18-2.89h0ZM515.2,89.34c-2.05-3.86-4.71-6.86-7.99-8.99-3.27-2.13-6.77-3.6-10.49-4.42-3.72-.82-7.24-1.22-10.56-1.22-4.78,0-9.43.71-13.93,2.13s-8.49,3.69-11.94,6.79c-3.47,3.1-6.14,7.19-7.99,12.28l15.18,4.11c.78-1.93,1.97-3.78,3.56-5.57,1.59-1.78,3.66-3.24,6.23-4.39,2.57-1.15,5.63-1.72,9.2-1.72s6.36.59,8.68,1.79c2.32,1.2,4.06,2.88,5.24,5.07,1.18,2.18,1.75,4.88,1.75,8.08v.46c0,1.98-.72,3.42-2.17,4.3-1.45.89-3.67,1.53-6.71,1.91-3.03.38-6.97.88-11.8,1.48-3.86.46-7.67,1.15-11.4,2.06-3.74.91-7.13,2.29-10.19,4.11-3.06,1.83-5.48,4.29-7.25,7.39-1.79,3.1-2.68,7.06-2.68,11.89,0,5.59,1.22,10.32,3.66,14.18,2.44,3.86,5.77,6.8,9.97,8.81,4.21,2,8.9,3.01,14.08,3.01,4.44,0,8.27-.68,11.47-2.02,3.2-1.35,5.85-3.06,7.95-5.14,2.1-2.08,3.69-4.22,4.76-6.4h.81v11.66h15.62v-56.56c0-6.2-1.03-11.23-3.08-15.09h.02s0,0,0,0ZM502.21,130.29c0,3.31-.83,6.43-2.49,9.38-1.66,2.95-4.05,5.31-7.18,7.09s-6.89,2.67-11.29,2.67c-3.03,0-5.7-.46-7.99-1.38-2.3-.91-4.12-2.29-5.46-4.11-1.35-1.83-2.02-4.09-2.02-6.78,0-2.95.75-5.31,2.24-7.09s3.49-3.15,6.01-4.11c2.51-.96,5.28-1.65,8.32-2.06,1.27-.16,2.88-.36,4.83-.61,1.95-.25,3.98-.57,6.09-.95,2.1-.38,3.97-.82,5.6-1.29,1.63-.48,2.75-1.03,3.33-1.63v10.9h0s0-.01,0-.01Z"/></g></g></g></svg></div>
+    <p class="tag" style="color:#b7ddd9;margin:36px 0 12px">For teams bringing their own model, stack or workflow</p>
+    <h1 class="display"><span class="serif">Your model. Your IDE. Your standards.</span><span class="bold">Maia builds and runs it, <em class="accent">with you in control</em>.</span></h1>
+    <p class="lede" style="margin-top:20px;max-width:680px">How Maia fits alongside the tools your team already uses, and what stays in your hands.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <p class="tag">Where you are today</p>
+  <h2>Three ways teams arrive</h2>
+  <p class="lead">You already have a model, a stack or a way of working. The goal is to fit Maia into it without asking you to start over.</p>
+  <div class="grid cols-3" style="margin-top:20px">
+    <div class="box"><h3>Bring your own LLM</h3><p>You’ve approved a model, and may have a RAG over your standards and data dictionary.</p><p class="tag">What matters</p><p>Which model sees what, and where the plan gets written.</p></div>
+    <div class="box"><h3>Build it yourself</h3><p>A code-first stack your engineers know, often with no license cost.</p><p class="tag">What matters</p><p>What it takes to host, secure, upgrade and govern it as the team grows.</p></div>
+    <div class="box"><h3>Vibe coding</h3><p>Engineers prompt an assistant in VS Code or an agent client and iterate quickly.</p><p class="tag">What matters</p><p>Consistent standards, and a person approving before anything runs.</p></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">The clear picture</p>
+  <h2>What stays yours, and what Maia provides</h2>
+  <div class="grid cols-2" style="margin-top:20px">
+    <div class="box tint"><h3>Stays yours</h3>
+      <ul>
+        <li>Your model and RAG, used for planning</li>
+        <li>Your IDE and agent client</li>
+        <li>Your Git repository</li>
+        <li>Your data and compute, in your cloud with the hybrid setup</li>
+        <li>Your standards, written as documents</li>
+      </ul>
+    </div>
+    <div class="box"><h3>Maia provides</h3>
+      <ul>
+        <li>Maia Team, which builds pipelines from your plan</li>
+        <li>Rules, skills and reference documents applied to every build</li>
+        <li>Human approval before anything runs</li>
+        <li>Orchestration, and the runner that executes it</li>
+        <li>An audit trail and run history</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note" style="margin-top:14px">Maia Team runs on Maia’s managed model today and doesn’t take a customer-supplied model. Your model works alongside it: it plans the work, and can monitor the results.</p>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">How it works</p>
+  <h2>From your plan to a running pipeline</h2>
+  <div class="steps" style="margin-top:20px">
+    <div class="step"><div><h3>Plan with your model</h3><p>Your LLM and RAG write the plan in your IDE, using your standards and data dictionary.</p></div></div>
+    <div class="step"><div><h3>Hand it off</h3><p>Export the plan as a Markdown file and upload it, or copy and paste it into Maia.</p></div></div>
+    <div class="step"><div><h3>Maia builds</h3><p>Maia Team builds pipelines from the plan and applies the rules, skills and reference documents you’ve loaded.</p></div></div>
+    <div class="step"><div><h3>You approve</h3><p>Plan mode and permission settings keep a person in control before Maia runs anything.</p></div></div>
+    <div class="step"><div><h3>Run in your cloud</h3><p>Pipelines execute on the runner in your environment, with run history and an audit trail.</p></div></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Your standards</p>
+  <h2>Your standards travel with every build</h2>
+  <p class="lead">Load them once, and Maia applies them each time, so a new team member gets the same result as your most experienced engineer.</p>
+  <div class="grid cols-2" style="margin-top:20px">
+    <div class="box"><h3>Rules</h3><p>Pipeline standards and naming conventions that Maia follows when it builds.</p></div>
+    <div class="box"><h3>Skills</h3><p>Reusable instructions you can import for tasks your team repeats.</p></div>
+    <div class="box"><h3>Reference documents</h3><p>Markdown and PDF files in the project, such as design guides and runbooks.</p></div>
+    <div class="box"><h3>Context engine</h3><p>Semantic information plus business assets such as a data dictionary, a metrics glossary and data quality rules, so builds reflect what your data means.</p></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Guardrails</p>
+  <h2>Vibe coding with a person in the loop</h2>
+  <p class="lead">Fast iteration works best when the team can see what changed and why.</p>
+  <div class="grid cols-3" style="margin-top:20px">
+    <div class="box tint"><h3>Plan first</h3><p>Maia can produce a plan before it changes anything, and you can edit that plan.</p></div>
+    <div class="box tint"><h3>Approve each step</h3><p>Permission settings let Maia ask before it runs, so nothing executes without your say.</p></div>
+    <div class="box tint"><h3>Keep the record</h3><p>Tasks, plans and audit events document what was built and why, which helps the next person who picks it up.</p></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Your data</p>
+  <h2>Where your data goes</h2>
+  <div class="flow" style="margin-top:20px">
+    <div class="node">
+      <p class="tag" style="margin-bottom:6px">Maia-managed</p>
+      <h3>Control plane</h3>
+      <ul><li>Designer and Maia Team</li><li>Orchestration and management</li></ul>
+    </div>
+    <div class="arrow">→</div>
+    <div class="node bridge">
+      <p class="tag" style="margin-bottom:6px">Secure link</p>
+      <h3>TLS connection</h3>
+      <ul><li>Between the hub and your runner</li></ul>
+    </div>
+    <div class="arrow">→</div>
+    <div class="node">
+      <p class="tag" style="margin-bottom:6px">Your environment</p>
+      <h3>Runner</h3>
+      <ul><li>ECS or EKS on AWS, container app on Azure</li><li>Pipelines execute here, next to your data</li></ul>
+    </div>
+  </div>
+  <div class="grid cols-3" style="margin-top:16px">
+    <div class="box"><h3>Sampling control</h3><p>Maia asks before it samples data, and an account-level setting turns sampling off. With it off, only metadata goes to the model.</p></div>
+    <div class="box"><h3>Updates</h3><p>An auto-update option keeps the platform current, and updating a runner means restarting it.</p></div>
+    <div class="box"><h3>Network and certificates</h3><p>The runner sits in your network and needs outbound access to the hub. Custom certificates are set through runner environment variables.</p></div>
+  </div>
+  <p class="note" style="margin-top:14px">The Matillion Trust Center holds the white paper on deployment and what Maia Team sends to the model. Use it as the reference for your security review.</p>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Architecture</p>
+  <h2>Hybrid architecture: how data flows</h2>
+  <p class="lead">Maia manages the control plane. Your runner does the work, next to your data.</p>
+  <div class="archwrap" style="margin-top:20px">
+    <svg class="arch" viewBox="0 0 960 444" role="img" aria-labelledby="archT archD">
+      <title id="archT">Hybrid architecture with Maia and a runner in your environment</title>
+      <desc id="archD">Designer, Maia Team, the control plane and Maia’s managed model sit in the Maia-managed zone. A TLS link to the hub connects them to a runner in your own cloud, which reads and writes your data sources directly.</desc>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="hd"/></marker>
+      </defs>
+
+      <rect class="zone-m" x="16" y="36" width="290" height="392" rx="14"/>
+      <text class="z" x="34" y="62">MAIA-MANAGED</text>
+      <rect class="n" x="36" y="84" width="250" height="80" rx="10"/>
+      <text class="t" x="52" y="114">Designer and Maia Team</text>
+      <text class="s" x="52" y="136">Where you plan, build and approve</text>
+      <rect class="n" x="36" y="186" width="250" height="80" rx="10"/>
+      <text class="t" x="52" y="216">Control plane</text>
+      <text class="s" x="52" y="238">Orchestration and scheduling</text>
+      <rect class="n" x="36" y="288" width="250" height="108" rx="10"/>
+      <text class="t" x="52" y="318">Maia’s managed model</text>
+      <text class="s" x="52" y="340">Used by Maia Team</text>
+      <text class="s" x="52" y="360">Samples data only with your approval</text>
+      <line class="ln" x1="161" y1="164" x2="161" y2="186" marker-start="url(#ah)" marker-end="url(#ah)"/>
+      <line class="ln" x1="161" y1="266" x2="161" y2="288" marker-start="url(#ah)" marker-end="url(#ah)"/>
+
+      <rect class="ny" x="326" y="170" width="134" height="112" rx="10"/>
+      <text class="ty" x="342" y="200">TLS link</text>
+      <text class="sy" x="342" y="222">Hub gateway</text>
+      <text class="sy" x="342" y="242">Runner connects</text>
+      <text class="sy" x="342" y="260">outbound to it</text>
+      <line class="ln" x1="286" y1="226" x2="326" y2="226" marker-start="url(#ah)" marker-end="url(#ah)"/>
+      <line class="ln" x1="460" y1="226" x2="504" y2="226" marker-start="url(#ah)" marker-end="url(#ah)"/>
+
+      <rect class="zone-y" x="484" y="36" width="460" height="392" rx="14"/>
+      <text class="z" x="502" y="62">YOUR ENVIRONMENT (VPC OR VNET)</text>
+      <rect class="n" x="504" y="170" width="186" height="112" rx="10"/>
+      <text class="t" x="520" y="200">Runner</text>
+      <text class="s" x="520" y="222">ECS or EKS on AWS</text>
+      <text class="s" x="520" y="240">Container app on Azure</text>
+      <text class="s" x="520" y="262">Executes your pipelines</text>
+
+      <rect class="n" x="744" y="88" width="180" height="64" rx="10"/>
+      <text class="t" x="758" y="116">Cloud data warehouse</text>
+      <text class="s" x="758" y="136">Data stays here</text>
+      <rect class="n" x="744" y="194" width="180" height="64" rx="10"/>
+      <text class="t" x="758" y="222">Databases and files</text>
+      <text class="s" x="758" y="242">SaaS and other sources</text>
+      <rect class="n" x="744" y="300" width="180" height="64" rx="10"/>
+      <text class="t" x="758" y="328">On-prem sources</text>
+      <text class="s" x="758" y="348">Through your own VPN</text>
+      <line class="ln" x1="690" y1="226" x2="744" y2="120" marker-start="url(#ah)" marker-end="url(#ah)"/>
+      <line class="ln" x1="690" y1="226" x2="744" y2="226" marker-start="url(#ah)" marker-end="url(#ah)"/>
+      <line class="ln" x1="690" y1="226" x2="744" y2="332" marker-start="url(#ah)" marker-end="url(#ah)"/>
+      <text class="s" x="504" y="408">Your data is read and written inside this zone.</text>
+
+      <circle class="bd" cx="36" cy="84" r="12"/><text class="bn" x="36" y="88.5">1</text>
+      <circle class="bd" cx="393" cy="170" r="12"/><text class="bn" x="393" y="174.5">2</text>
+      <circle class="bd" cx="690" cy="170" r="12"/><text class="bn" x="690" y="174.5">3</text>
+      <circle class="bd" cx="393" cy="282" r="12"/><text class="bn" x="393" y="286.5">4</text>
+    </svg>
+  </div>
+  <div class="grid cols-4 arch-steps" style="margin-top:16px">
+    <div class="box"><h3>1 Trigger</h3><p>You build, schedule or run a pipeline in Maia.</p></div>
+    <div class="box"><h3>2 Instructions</h3><p>Maia sends the pipeline instructions to your runner over TLS. The runner connects outbound to the hub.</p></div>
+    <div class="box"><h3>3 Execution</h3><p>The runner reads and writes your data sources directly, so data processing stays in your environment.</p></div>
+    <div class="box"><h3>4 Status</h3><p>Run status and metadata return to Maia for monitoring, audit and history.</p></div>
+  </div>
+  <p class="note" style="margin-top:14px">This shows the hybrid deployment. A full SaaS option also exists. The Trust Center white paper and architecture diagrams are the reference for your security review.</p>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Connecting your model</p>
+  <h2>Connect your model for operations</h2>
+  <p class="lead">The Matillion MCP server lets an approved AI client work with your Maia resources.</p>
+  <div class="grid cols-3" style="margin-top:20px">
+    <div class="box"><h3>What it does</h3><p>Monitor pipeline executions, analyze credit consumption and trigger pipeline runs from your assistant.</p></div>
+    <div class="box"><h3>Safe by default</h3><p>Tools are read-only unless you turn on write tools, so you decide what the client can change.</p></div>
+    <div class="box"><h3>Works in your IDE</h3><p>Set it up in VS Code or Claude Code with an <code>mcp.json</code> file and your credentials.</p></div>
+  </div>
+  <p class="note" style="margin-top:14px">MCP is for operating and monitoring. Build instructions arrive as an exported plan.</p>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">How they interact</p>
+  <h2>Your model and Maia, side by side</h2>
+  <p class="lead">Two separate paths: operating Maia through MCP, and building from a plan you export.</p>
+  <div class="archwrap" style="margin-top:20px">
+    <svg class="arch" viewBox="0 0 960 424" role="img" aria-labelledby="mcpT mcpD">
+      <title id="mcpT">How your model and environment interact with Maia through MCP and a plan handoff</title>
+      <desc id="mcpD">Your LLM and RAG write a plan in your IDE. The IDE connects to Maia through the Matillion MCP server to monitor runs and audit data. The plan itself reaches Maia Team as a Markdown upload or copy and paste.</desc>
+      <defs>
+        <marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="hd"/></marker>
+      </defs>
+
+      <rect class="zone-y" x="16" y="36" width="290" height="370" rx="14"/>
+      <text class="z" x="34" y="62">YOUR ENVIRONMENT</text>
+      <rect class="n" x="36" y="84" width="250" height="84" rx="10"/>
+      <text class="t" x="52" y="114">Your LLM and RAG</text>
+      <text class="s" x="52" y="136">Approved model, your standards,</text>
+      <text class="s" x="52" y="154">your data dictionary</text>
+      <rect class="n" x="36" y="190" width="250" height="84" rx="10"/>
+      <text class="t" x="52" y="220">IDE or agent client</text>
+      <text class="s" x="52" y="242">VS Code, Claude Code</text>
+      <text class="s" x="52" y="260">MCP set up in mcp.json</text>
+      <rect class="n" x="36" y="296" width="250" height="84" rx="10"/>
+      <text class="t" x="52" y="326">Plan as Markdown</text>
+      <text class="s" x="52" y="348">Written with your model and RAG</text>
+      <text class="s" x="52" y="366">Reviewed by your team</text>
+      <line class="ln" x1="161" y1="168" x2="161" y2="190" marker-start="url(#ah2)" marker-end="url(#ah2)"/>
+      <line class="ln" x1="161" y1="274" x2="161" y2="296" marker-end="url(#ah2)"/>
+
+      <rect class="ny" x="336" y="170" width="150" height="124" rx="10"/>
+      <text class="ty" x="352" y="198">Matillion</text>
+      <text class="ty" x="352" y="216">MCP server</text>
+      <text class="sy" x="352" y="240">Read-only by default</text>
+      <text class="sy" x="352" y="258">Write tools opt-in</text>
+      <text class="sy" x="352" y="276">Launched via npx</text>
+      <line class="ln" x1="286" y1="232" x2="336" y2="232" marker-start="url(#ah2)" marker-end="url(#ah2)"/>
+
+      <rect class="zone-m" x="516" y="36" width="428" height="370" rx="14"/>
+      <text class="z" x="534" y="62">MAIA</text>
+      <rect class="n" x="536" y="84" width="388" height="72" rx="10"/>
+      <text class="t" x="552" y="112">Pipeline runs and schedules</text>
+      <text class="s" x="552" y="134">Monitor executions, trigger runs</text>
+      <rect class="n" x="536" y="172" width="388" height="72" rx="10"/>
+      <text class="t" x="552" y="200">Audit trail and credit use</text>
+      <text class="s" x="552" y="222">Events, failures and consumption</text>
+      <rect class="n" x="536" y="296" width="388" height="84" rx="10"/>
+      <text class="t" x="552" y="326">Maia Team</text>
+      <text class="s" x="552" y="348">Builds from your plan and applies your rules</text>
+      <text class="s" x="552" y="366">A person approves. Uses Maia’s managed model.</text>
+      <line class="ln" x1="486" y1="232" x2="536" y2="120" marker-start="url(#ah2)" marker-end="url(#ah2)"/>
+      <line class="ln" x1="486" y1="232" x2="536" y2="208" marker-start="url(#ah2)" marker-end="url(#ah2)"/>
+
+      <line class="ln" style="stroke-dasharray:7 5" x1="286" y1="338" x2="536" y2="338" marker-end="url(#ah2)"/>
+      <text class="s" text-anchor="middle" x="411" y="320">Manual handoff</text>
+      <text class="s" text-anchor="middle" x="411" y="364">Upload .md or copy and paste</text>
+
+      <circle class="bd" cx="36" cy="296" r="12"/><text class="bn" x="36" y="300.5">1</text>
+      <circle class="bd" cx="411" cy="338" r="12"/><text class="bn" x="411" y="342.5">2</text>
+      <circle class="bd" cx="411" cy="170" r="12"/><text class="bn" x="411" y="174.5">3</text>
+      <circle class="bd" cx="536" cy="84" r="12"/><text class="bn" x="536" y="88.5">4</text>
+    </svg>
+  </div>
+  <div class="grid cols-4 arch-steps" style="margin-top:16px">
+    <div class="box"><h3>1 Plan</h3><p>Your model and RAG write the plan in your IDE, using your standards.</p></div>
+    <div class="box"><h3>2 Hand off</h3><p>Export it as Markdown and upload it, or copy and paste it into Maia Team. Maia builds, and a person approves.</p></div>
+    <div class="box"><h3>3 Operate</h3><p>Your client talks to Maia through the MCP server. Tools are read-only unless you enable write tools.</p></div>
+    <div class="box"><h3>4 Results</h3><p>Run status, failures, credit use and audit events come back to your assistant.</p></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Build or buy</p>
+  <h2>What moves to Maia from a self-built stack</h2>
+  <div class="tablewrap" style="margin-top:20px">
+    <table>
+      <thead><tr><th>Concern</th><th>Self-built stack</th><th>With Maia</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Orchestration and scheduling</td><td>You build and maintain it</td><td>Part of the platform</td></tr>
+        <tr><td class="k">Standards across the team</td><td>Held in prompts and wikis, applied by habit</td><td>Loaded as rules, skills and reference documents</td></tr>
+        <tr><td class="k">Approval before changes run</td><td>Add review tooling and process</td><td>Plan mode and permission settings</td></tr>
+        <tr><td class="k">Audit and run history</td><td>Assemble from logs</td><td>Audit events and run history, also reachable over MCP</td></tr>
+        <tr><td class="k">Upgrades and patching</td><td>Your team owns versions and runtimes</td><td>Auto-update option, runner restart</td></tr>
+        <tr><td class="k">Security review</td><td>Review each component</td><td>One platform with Trust Center documentation</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note" style="margin-top:14px">A self-built stack gives full control and suits teams with strong platform engineering. This table shows what moves to Maia, not a verdict.</p>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Moving over</p>
+  <h2>Starting from what you have</h2>
+  <div class="grid cols-3" style="margin-top:20px">
+    <div class="box"><h3>From Matillion ETL</h3><p>The Upgrade Assistant imports jobs into Maia Foundation. A migration analysis reports, component by component, what migrates as is and what needs revalidation. In assessments our team has run, 90% or more typically migrates directly.</p></div>
+    <div class="box"><h3>From other tools</h3><p>Maia Team can read an exported job definition, such as a JSON file, and recommend a plan to convert it, including efficiency improvements.</p></div>
+    <div class="box"><h3>Your Git</h3><p>Maia works with GitHub, Azure, GitLab and Bitbucket, or you can use Maia-hosted Git. Approval to connect your repository is the step to start early.</p></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section>
+  <p class="tag">Working session</p>
+  <h2>Questions to settle together</h2>
+  <div class="grid cols-2" style="margin-top:20px">
+    <div class="box"><h3>Model and data</h3>
+      <ol class="qlist">
+        <li>Which models are approved, and for which data classes?</li>
+        <li>Is the limit a policy, a contract or a preference?</li>
+        <li>What does your RAG hold, and who maintains it?</li>
+      </ol>
+    </div>
+    <div class="box"><h3>Workflow and rollout</h3>
+      <ol class="qlist">
+        <li>Where do your developers work day to day?</li>
+        <li>How do changes reach production today, and through which Git?</li>
+        <li>What does a successful pilot look like for your team?</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="tag">Path forward</p>
+  <h2>A practical first 30 days</h2>
+  <div class="steps" style="margin-top:20px">
+    <div class="step"><div><h3>Working session</h3><p>Map your model, IDE and standards to the plan handoff.</p></div></div>
+    <div class="step"><div><h3>Security review</h3><p>Walk your security team through the Trust Center white paper and architecture.</p></div></div>
+    <div class="step"><div><h3>Migration analysis</h3><p>If you run Matillion ETL, export your metadata and review the report.</p></div></div>
+    <div class="step"><div><h3>Hands-on pilot</h3><p>Build one non-sensitive pipeline in a demo environment, with success criteria agreed up front.</p></div></div>
+  </div>
+  <div class="band">
+    <p class="tag">The short version</p>
+    <h2>Keep your tools. Let Maia <em class="accent">build and run</em> what they plan.</h2>
+    <p>Your model and RAG stay in your hands. Maia adds the standards, approvals and run history around them.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site"><div class="wrap"><svg style="height:20px;width:auto" role="img" aria-label="Maia by Matillion" id="maia_bee_icon_Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 326.6 376.3">
+  <defs>
+    <style>
+      .maia_bee_icon_st0 { fill: url(#maia_bee_icon_linear-gradient2); }
+      .maia_bee_icon_st1 { fill: url(#maia_bee_icon_linear-gradient1); }
+      .maia_bee_icon_st2 { fill: url(#maia_bee_icon_linear-gradient3); }
+      .maia_bee_icon_st3 { fill: url(#maia_bee_icon_linear-gradient5); }
+      .maia_bee_icon_st4 { fill: url(#maia_bee_icon_linear-gradient4); }
+      .maia_bee_icon_st5 { fill: url(#maia_bee_icon_linear-gradient); }
+      .maia_bee_icon_st6 { isolation: isolate; }
+      .maia_bee_icon_st7 { mix-blend-mode: multiply; }
+    </style>
+    <linearGradient id="maia_bee_icon_linear-gradient" x1="336.3" y1="-5211.7" x2="255" y2="-5104.8" gradientTransform="translate(0 5132.2)" gradientUnits="userSpaceOnUse">
+      <stop offset=".7" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient1" x1="122.3" y1="-5196.1" x2="60.7" y2="-5105" gradientTransform="translate(0 5132.2)" gradientUnits="userSpaceOnUse">
+      <stop offset=".5" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient2" x1="346.8" y1="168.4" x2="202.5" y2="51.9" gradientTransform="translate(0 378) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient3" x1="196.8" y1="297" x2="87.9" y2="200.7" gradientTransform="translate(0 378) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient4" x1="223.6" y1="266.7" x2="114.7" y2="170.4" gradientTransform="translate(0 378) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#235b58"/>
+      <stop offset="1" stop-color="#003431"/>
+    </linearGradient>
+    <linearGradient id="maia_bee_icon_linear-gradient5" x1="-86.2" y1="-4707.6" x2="320" y2="-5088.9" gradientTransform="translate(0 5132.2)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ab6f00"/>
+      <stop offset=".1" stop-color="#c98c00"/>
+      <stop offset=".2" stop-color="#e0a300"/>
+      <stop offset=".4" stop-color="#f1b300"/>
+      <stop offset=".5" stop-color="#fabd00"/>
+      <stop offset=".6" stop-color="#ffc000"/>
+      <stop offset="1" stop-color="#fff1cc"/>
+    </linearGradient>
+  </defs>
+  <g class="maia_bee_icon_st6">
+    <g id="maia_bee_icon_Layer_2">
+      <g id="maia_bee_icon_Layer_11" data-name="Layer_1">
+        <g class="maia_bee_icon_st7">
+          <g>
+            <path class="maia_bee_icon_st5" d="M248.9,25l-2.9,4.6c-1.6,2.6-.7,6,1.9,7.5l4.3,2.4c2.6,1.5,5.8.7,7.3-1.9l2.8-4.5,7.1.2c1.8,0,3.4-.8,4.3-2.3l7-11.5c.9-1.5,1-3.3.1-4.9l-6.4-11.8c-.8-1.5-2.4-2.5-4.1-2.6l-13.4-.3c-1.8,0-3.4.9-4.3,2.3l-7,11.5c-.9,1.5-1,3.3-.1,4.9l3.4,6.3h0Z"/>
+            <path class="maia_bee_icon_st1" d="M52.7,31.3c.9,1.5,2.5,2.4,4.3,2.3l7.1-.2,2.7,4.3c1.6,2.5,4.8,3.3,7.3,1.9l4.3-2.4c2.7-1.5,3.5-4.9,1.9-7.5l-2.7-4.5,3.4-6.3c.8-1.5.8-3.4-.1-4.9l-7-11.5c-.9-1.5-2.5-2.4-4.3-2.3l-13.4.4c-1.8,0-3.3,1-4.2,2.6l-6.4,11.8c-.8,1.5-.8,3.4.1,4.9l7,11.5h0s0,0,0,0Z"/>
+          </g>
+          <path class="maia_bee_icon_st0" d="M247.1,237.5l-1.9-5.1c-9.1,28.1-31.2,50.2-59.3,59.3,28.1,9.1,50.3,31.4,59.3,59.3,9-27.9,31.3-50.3,59.3-59.3-26.2-8.6-47.6-28.3-57.4-54.2h0s0,0,0,0Z"/>
+          <path class="maia_bee_icon_st2" d="M95.4,140.6h0c9.4,0,17.1,7.6,17.1,17.1v25.8c0,9.4-7.6,17.1-17.1,17.1h0c-9.4,0-17.1-7.6-17.1-17.1v-25.8c0-9.4,7.6-17.1,17.1-17.1Z"/>
+          <path class="maia_bee_icon_st4" d="M156.6,140.6h0c9.4,0,17.1,7.6,17.1,17.1v25.8c0,9.4-7.6,17.1-17.1,17.1h0c-9.4,0-17.1-7.6-17.1-17.1v-25.8c0-9.4,7.6-17.1,17.1-17.1Z"/>
+          <path class="maia_bee_icon_st3" d="M294,84.7l-98.2-56.7c-20.1-11.6-45-11.6-65.1,0l-98.2,56.7C12.5,96.3,0,117.9,0,141.1v113.4c0,23.2,12.5,44.8,32.5,56.4l98.2,56.7c10,5.8,21.3,8.7,32.6,8.7s22.5-2.9,32.6-8.7l17.5-10.1s0,0,0,0c7.2-4.7,9.5-14.3,5.2-21.8l-1.8-3h0c-6.4-9.3-15.2-16.7-25.6-21.4-8.2-3.7-17.8-3.2-25.6,1.4h0c-10.4,6-23.2,6-33.6,0l-80.1-46.3c-10.4-6-16.8-17.1-16.8-29.1v-92.5c0-12,6.4-23.1,16.8-29.1l80.1-46.2c10.4-6,23.2-6,33.6,0l80.1,46.2c10.4,6,16.8,17.1,16.8,29.1v74.5c0,29.6,24.2,53.7,53.7,53.7h1.2c5.1,0,9.3-4,9.3-8.8h0v-123.1c0-23.2-12.5-44.8-32.5-56.4h0Z"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg> <span style="vertical-align:middle;margin-left:8px">Details reflect Maia as of November 2026. Confirm specifics with your Maia team and the Matillion Trust Center.</span></div></footer>
+
+<script>
+(function(){
+  var els = [].slice.call(document.querySelectorAll('header.hero, main > section'));
+  els.forEach(function(el){ el.classList.add('slide'); });
+  var i = 0, on = false;
+  var body = document.body;
+  var count = document.getElementById('pCount');
+  var prog = document.getElementById('presProg');
+  function render(){
+    els.forEach(function(e){ e.classList.remove('active'); });
+    els[i].classList.add('active');
+    els[i].scrollTop = 0;
+    count.textContent = (i + 1) + ' / ' + els.length;
+    prog.style.width = ((i + 1) / els.length * 100) + '%';
+  }
+  function go(n){ if (n < 0 || n >= els.length) return; i = n; render(); }
+  function enter(){ on = true; body.classList.add('presenting'); i = 0; render(); }
+  function exit(){
+    on = false; body.classList.remove('presenting'); menu.classList.remove('open');
+    var el = els[i];
+    els.forEach(function(e){ e.classList.remove('active'); });
+    try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
+    try { el.scrollIntoView(); } catch(e) {}
+  }
+  function fs(){
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    } catch(e) {}
+  }
+  document.getElementById('presentBtn').addEventListener('click', enter);
+  document.getElementById('pNext').addEventListener('click', function(){ go(i + 1); });
+  document.getElementById('pPrev').addEventListener('click', function(){ go(i - 1); });
+  document.getElementById('pExit').addEventListener('click', exit);
+  document.getElementById('pFs').addEventListener('click', fs);
+  var menu = document.getElementById('presMenu');
+  els.forEach(function(el, n){
+    var h = el.querySelector('h2');
+    var b = document.createElement('button');
+    b.type = 'button';
+    var num = document.createElement('span'); num.className = 'pn'; num.textContent = n + 1;
+    var lab = document.createElement('span'); lab.textContent = h ? h.textContent : 'Title';
+    b.appendChild(num); b.appendChild(lab);
+    b.addEventListener('click', function(){ go(n); menu.classList.remove('open'); });
+    menu.appendChild(b);
+  });
+  function openMenu(){
+    [].slice.call(menu.children).forEach(function(b, n){ b.classList.toggle('cur', n === i); });
+    menu.classList.toggle('open');
+  }
+  document.getElementById('pMenu').addEventListener('click', openMenu);
+  var buf = '', bt = null;
+  function digit(d){
+    buf += d; clearTimeout(bt);
+    bt = setTimeout(function(){ var n = parseInt(buf, 10) - 1; buf = ''; if (n >= 0 && n < els.length) go(n); }, 600);
+  }
+  document.addEventListener('keydown', function(e){
+    if (!on) return;
+    var k = e.key;
+    if ((k === ' ' || k === 'Enter') && menu.classList.contains('open')) { return; }
+    else if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); go(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); go(i - 1); }
+    else if (k === 'Home') { e.preventDefault(); go(0); }
+    else if (k === 'End') { e.preventDefault(); go(els.length - 1); }
+    else if (k === 'Escape') { if (menu.classList.contains('open')) menu.classList.remove('open'); else exit(); }
+    else if (k === 'g' || k === 'G') { openMenu(); }
+    else if (/^[0-9]$/.test(k)) { digit(k); }
+    else if (k === 'f' || k === 'F') { fs(); }
+  });
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ if (on) x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (!on || x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 60) go(i + (dx < 0 ? 1 : -1));
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
