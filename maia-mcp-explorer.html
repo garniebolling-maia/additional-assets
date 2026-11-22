@@ -215,15 +215,33 @@ footer img{width:130px;height:auto}
 footer p{color:var(--ink2);font-size:.85rem;max-width:560px}
 .logo-dark{display:var(--logo-dark)}.logo-light{display:var(--logo-light)}
 
-/* presenter mode */
-.pbar{display:none}
-body.present .pbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;justify-content:center;align-items:center;gap:14px;background:var(--bg);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-left,0px)) calc(10px + env(safe-area-inset-bottom,0px))}
+/* present mode */
+.pbar,.pmenu{display:none}
+body.present .pbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-left,0px)) calc(10px + env(safe-area-inset-bottom,0px))}
 body.present{padding-bottom:84px}
+body.present .nav{display:none}
+body.present .cta #presentBtn{display:none}
 body.present section.slide{min-height:calc(100vh - 150px)}
+body.present .hero .wrap{padding-bottom:96px}
+.pbar .pill{padding:.5rem 1rem}
+.pbar .pill:disabled{opacity:.4;cursor:default}
+.pbar button:focus-visible,.pmenu button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.pbar .pcount{gap:.65rem;border-color:var(--ink2)}
+.pbar .pcount .pn{font-variant-numeric:tabular-nums;opacity:.8}
+.pbar .pcount .ptitle{font-weight:600}
+.pbar .pcount .caret{font-size:.7rem;opacity:.8}
 .dots{display:flex;gap:8px}
 .dots button{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink2);background:transparent;padding:0;cursor:pointer}
 .dots button[aria-current="true"]{background:var(--gold);border-color:var(--gold)}
-body.present .hero .wrap{padding-bottom:96px}
+body.present .pmenu:not([hidden]){display:block;position:fixed;left:50%;transform:translateX(-50%);bottom:var(--pbar-h,78px);z-index:80;width:min(460px,calc(100vw - 24px));max-height:min(62vh,440px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px}
+.pmenu .mhead{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink2);padding:6px 12px 8px}
+.pmenu button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:0;border-radius:10px;padding:10px 12px;color:var(--ink);font:inherit;cursor:pointer}
+.pmenu button:hover{background:var(--mint)}
+.pmenu button[aria-current="true"]{background:var(--sel-bg);color:var(--sel-fg)}
+.pmenu .mn{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600}
+.pmenu .mt{flex:1;font-weight:500}
+.pmenu .mk{font-size:.75rem;opacity:.7}
+@media (max-width:700px){body.present .pbar .dots{display:none}}
 
 @media (max-width:900px){
   .how{grid-template-columns:minmax(0,1fr)}
@@ -267,7 +285,7 @@ img{max-width:100%}
     <p class="lead">The Matillion MCP server lets an AI assistant look up runs, schedules, lineage, credit use and audit history, and start work for you. It runs on your own machine with your own API credentials. Pick a question and watch what happens.</p>
     <div class="cta">
       <a class="pill" href="#how"><span>Start the <b>tour</b></span></a>
-      <button class="pill" type="button" id="presentBtn" aria-pressed="false"><span>Presenter <b>mode</b></span></button>
+      <button class="pill" type="button" id="presentBtn" aria-pressed="false"><span>Present <b>mode</b></span></button>
     </div>
     <div class="stats" aria-label="Maia MCP in numbers">
       <div class="stat"><div class="n">68</div><div class="c">tools in the full server</div></div>
@@ -392,12 +410,15 @@ img{max-width:100%}
   </div>
 </footer>
 
-<div class="pbar" id="pbar" role="group" aria-label="Presenter controls">
+<div class="pbar" id="pbar" role="group" aria-label="Presentation controls">
   <button class="pill" type="button" id="prev">Back</button>
-  <div class="dots" id="dots"></div>
+  <button class="pill pcount" type="button" id="slideBtn" aria-haspopup="true" aria-expanded="false" aria-controls="pmenu" title="Choose a slide (S)"><span class="pn" id="pcount">1 / 5</span><span class="ptitle" id="ptitle">Overview</span><span class="caret" aria-hidden="true">&#9650;</span></button>
+  <div class="dots" id="dots" role="group" aria-label="Slides"></div>
   <button class="pill" type="button" id="next">Next</button>
-  <button class="pill" type="button" id="exit">Exit</button>
+  <button class="pill" type="button" id="fsBtn" title="Full screen (F)">Full screen</button>
+  <button class="pill" type="button" id="exit" title="Exit present mode (Esc)">Exit</button>
 </div>
+<div class="pmenu" id="pmenu" role="menu" aria-label="Slides" hidden></div>
 
 <script>
 (function(){
@@ -577,34 +598,98 @@ img{max-width:100%}
   }
   showScene(S[0]);
 
-  /* ---------- presenter mode ---------- */
+  /* ---------- present mode ---------- */
   var slides=$$('[data-slide]'),idx=0,present=false;
-  var dots=$('#dots');
-  slides.forEach(function(s,i){var d=document.createElement('button');d.type='button';d.setAttribute('aria-label','Go to section '+(i+1));d.addEventListener('click',function(){go(i)});dots.appendChild(d)});
+  var dots=$('#dots'),menu=$('#pmenu'),slideBtn=$('#slideBtn');
+  var fallback=['Overview','Ask a question','Explore the tools','Connect other systems','Know the limits'];
+  slides.forEach(function(s,i){
+    if(!s.getAttribute('data-title')){
+      var k=s.querySelector('.kicker');
+      s.setAttribute('data-title',k?k.textContent.replace(/^\s*\d+\s*\u00b7\s*/,'').trim():(fallback[i]||('Slide '+(i+1))));
+    }
+  });
+  var titleOf=function(i){return slides[i].getAttribute('data-title')};
+  menu.innerHTML='<div class="mhead">Slides</div>';
+  slides.forEach(function(s,i){
+    var d=document.createElement('button');d.type='button';
+    d.setAttribute('aria-label','Go to slide '+(i+1)+': '+titleOf(i));d.title=(i+1)+'. '+titleOf(i);
+    d.addEventListener('click',function(){go(i)});dots.appendChild(d);
+    var m=document.createElement('button');m.type='button';m.setAttribute('role','menuitem');m.setAttribute('data-i',i);
+    m.innerHTML='<span class="mn">'+(i+1)+'</span><span class="mt">'+esc(titleOf(i))+'</span><span class="mk"></span>';
+    m.addEventListener('click',function(){go(i);closeMenu(true)});menu.appendChild(m);
+  });
   function go(i){
     idx=Math.max(0,Math.min(slides.length-1,i));
     slides.forEach(function(s,j){s.hidden=present&&j!==idx});
     $$('#dots button').forEach(function(d,j){d.setAttribute('aria-current',j===idx?'true':'false')});
+    $$('#pmenu [data-i]').forEach(function(m,j){m.setAttribute('aria-current',j===idx?'true':'false');m.lastChild.textContent=j===idx?'Now showing':''});
     $('#prev').disabled=idx===0;$('#next').disabled=idx===slides.length-1;
+    $('#pcount').textContent=(idx+1)+' / '+slides.length;$('#ptitle').textContent=titleOf(idx);
     var id=slides[idx].id;try{history.replaceState(null,'','#'+id)}catch(e){}
     window.scrollTo(0,0);
   }
+  function fit(){
+    var h=$('#pbar').offsetHeight;
+    document.documentElement.style.setProperty('--pbar-h',(h+8)+'px');
+    document.body.style.paddingBottom=present?(h+12)+'px':'';
+  }
+  window.addEventListener('resize',function(){if(present)fit()});
+  function openMenu(){
+    if(!present)return;fit();menu.hidden=false;slideBtn.setAttribute('aria-expanded','true');
+    var cur=$('#pmenu [aria-current="true"]')||$('#pmenu [data-i]');if(cur)cur.focus();
+  }
+  function closeMenu(refocus){
+    if(menu.hidden)return;menu.hidden=true;slideBtn.setAttribute('aria-expanded','false');
+    if(refocus)slideBtn.focus();
+  }
+  function toggleMenu(){menu.hidden?openMenu():closeMenu(true)}
   function setPresent(on){
     present=on;document.body.classList.toggle('present',on);
     $('#presentBtn').setAttribute('aria-pressed',on?'true':'false');
-    if(on){var h=location.hash.replace('#','');var i=slides.findIndex?slides.findIndex(function(s){return s.id===h}):-1;go(i>-1?i:0)}
-    else{slides.forEach(function(s){s.hidden=false})}
+    closeMenu(false);
+    if(on){fit()}else{document.body.style.paddingBottom=''}
+    if(on){var h=location.hash.replace('#','');var i=-1;for(var k=0;k<slides.length;k++){if(slides[k].id===h){i=k;break}}go(i>-1?i:0)}
+    else{slides.forEach(function(s){s.hidden=false});if(document.fullscreenElement&&document.exitFullscreen){document.exitFullscreen()}}
   }
+  function toggleFs(){
+    var el=document.documentElement;
+    if(document.fullscreenElement){document.exitFullscreen()}
+    else if(el.requestFullscreen){el.requestFullscreen().catch(function(){})}
+  }
+  var fsBtn=$('#fsBtn');
+  if(!document.documentElement.requestFullscreen){fsBtn.hidden=true}
+  document.addEventListener('fullscreenchange',function(){fsBtn.textContent=document.fullscreenElement?'Exit full screen':'Full screen'});
+  fsBtn.addEventListener('click',toggleFs);
+  slideBtn.addEventListener('click',toggleMenu);
+  document.addEventListener('click',function(e){
+    if(menu.hidden)return;
+    if(!menu.contains(e.target)&&!slideBtn.contains(e.target))closeMenu(false);
+  });
   $('#presentBtn').addEventListener('click',function(){setPresent(!present)});
   $('#exit').addEventListener('click',function(){setPresent(false)});
   $('#prev').addEventListener('click',function(){go(idx-1)});
   $('#next').addEventListener('click',function(){go(idx+1)});
   document.addEventListener('keydown',function(e){
     if(!present)return;
-    var t=e.target&&e.target.tagName;if(t==='INPUT')return;
-    if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(idx+1)}
-    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(idx-1)}
-    if(e.key==='Escape'){setPresent(false)}
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    var t=e.target&&e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT')return;
+    var k=e.key;
+    if(!menu.hidden){
+      var items=$$('#pmenu [data-i]'),pos=items.indexOf(document.activeElement);
+      if(k==='ArrowDown'){e.preventDefault();items[(pos+1+items.length)%items.length].focus();return}
+      if(k==='ArrowUp'){e.preventDefault();items[(pos-1+items.length)%items.length].focus();return}
+      if(k==='Home'){e.preventDefault();items[0].focus();return}
+      if(k==='End'){e.preventDefault();items[items.length-1].focus();return}
+      if(k==='Escape'){e.preventDefault();closeMenu(true);return}
+    }
+    if(k==='ArrowRight'||k==='PageDown'){e.preventDefault();go(idx+1)}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();go(idx-1)}
+    else if(k==='Home'){e.preventDefault();go(0)}
+    else if(k==='End'){e.preventDefault();go(slides.length-1)}
+    else if(k>='1'&&k<='9'&&parseInt(k,10)<=slides.length){e.preventDefault();go(parseInt(k,10)-1)}
+    else if(k==='s'||k==='S'){e.preventDefault();toggleMenu()}
+    else if(k==='f'||k==='F'){e.preventDefault();toggleFs()}
+    else if(k==='Escape'){setPresent(false)}
   });
   $$('[data-nav]').forEach(function(a){a.addEventListener('click',function(e){
     if(!present)return;e.preventDefault();var id=a.getAttribute('data-nav');
@@ -622,6 +707,7 @@ img{max-width:100%}
   }
 
   run(Q[0]);
+  if(/[?&]present(=|&|$)/.test(location.search)){setPresent(true)}
 })();
 </script>
 </body>
