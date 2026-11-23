@@ -103,7 +103,8 @@ section.slide + section.slide{border-top:1px solid var(--line)}
 .how{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:28px;margin-top:40px;align-items:start}
 .chips{display:flex;flex-direction:column;gap:10px}
 .chips .pill{justify-content:flex-start;text-align:left;border-radius:16px;padding:.75rem 1rem;border-color:var(--line);background:var(--surface)}
-.chips .pill[aria-pressed="true"]{border-color:var(--sel-bg)}
+.chips .pill[aria-pressed="true"]{background:var(--sel-bg);color:var(--sel-fg);border-color:var(--sel-bg)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .stage{min-width:0;display:flex;flex-direction:column;gap:14px}
 .bubble{border-radius:18px;padding:14px 18px;max-width:92%}
 .bubble.user{align-self:flex-end;background:var(--brand);color:#fff}
@@ -217,7 +218,7 @@ footer p{color:var(--ink2);font-size:.85rem;max-width:560px}
 
 /* present mode */
 .pbar,.pmenu{display:none}
-body.present .pbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-left,0px)) calc(10px + env(safe-area-inset-bottom,0px))}
+body.present .pbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;justify-content:flex-start;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg);border-top:1px solid var(--line);padding:10px clamp(16px,3vw,40px) calc(10px + env(safe-area-inset-bottom,0px))}
 body.present{padding-bottom:84px}
 body.present .nav{display:none}
 body.present .cta #presentBtn{display:none}
@@ -226,14 +227,15 @@ body.present .hero .wrap{padding-bottom:96px}
 .pbar .pill{padding:.5rem 1rem}
 .pbar .pill:disabled{opacity:.4;cursor:default}
 .pbar button:focus-visible,.pmenu button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.pbar .pcount{gap:.65rem;border-color:var(--ink2)}
+.pbar .pcount{gap:.65rem;border-color:var(--ink2);width:min(400px,36vw);justify-content:flex-start}
 .pbar .pcount .pn{font-variant-numeric:tabular-nums;opacity:.8}
-.pbar .pcount .ptitle{font-weight:600}
-.pbar .pcount .caret{font-size:.7rem;opacity:.8}
+.pbar .pcount .ptitle{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.pbar #fsBtn{margin-left:auto}
+.pbar .pcount .caret{font-size:.7rem;opacity:.8;margin-left:auto}
 .dots{display:flex;gap:8px}
 .dots button{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink2);background:transparent;padding:0;cursor:pointer}
 .dots button[aria-current="true"]{background:var(--gold);border-color:var(--gold)}
-body.present .pmenu:not([hidden]){display:block;position:fixed;left:50%;transform:translateX(-50%);bottom:var(--pbar-h,78px);z-index:80;width:min(460px,calc(100vw - 24px));max-height:min(62vh,440px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px}
+body.present .pmenu:not([hidden]){display:block;position:fixed;left:clamp(16px,3vw,40px);transform:none;bottom:var(--pbar-h,78px);z-index:80;width:min(460px,calc(100vw - 24px));max-height:min(62vh,440px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px}
 .pmenu .mhead{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink2);padding:6px 12px 8px}
 .pmenu button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:0;border-radius:10px;padding:10px 12px;color:var(--ink);font:inherit;cursor:pointer}
 .pmenu button:hover{background:var(--mint)}
@@ -412,9 +414,9 @@ img{max-width:100%}
 
 <div class="pbar" id="pbar" role="group" aria-label="Presentation controls">
   <button class="pill" type="button" id="prev">Back</button>
+  <button class="pill" type="button" id="next">Next</button>
   <button class="pill pcount" type="button" id="slideBtn" aria-haspopup="true" aria-expanded="false" aria-controls="pmenu" title="Choose a slide (S)"><span class="pn" id="pcount">1 / 5</span><span class="ptitle" id="ptitle">Overview</span><span class="caret" aria-hidden="true">&#9650;</span></button>
   <div class="dots" id="dots" role="group" aria-label="Slides"></div>
-  <button class="pill" type="button" id="next">Next</button>
   <button class="pill" type="button" id="fsBtn" title="Full screen (F)">Full screen</button>
   <button class="pill" type="button" id="exit" title="Exit present mode (Esc)">Exit</button>
 </div>
@@ -480,7 +482,7 @@ img{max-width:100%}
   function run(q){
     timers.forEach(clearTimeout);timers=[];cur=q;
     $$('#chips .pill').forEach(function(b){b.setAttribute('aria-pressed',b.id==='q-'+q.id?'true':'false')});
-    stage.innerHTML='<div class="bubble user">'+esc(q.label)+'</div><div class="steps" id="steps"></div><div id="out"></div>';
+    stage.innerHTML='<p class="sr">Question: '+esc(q.label)+'</p><div class="steps" id="steps"></div><div id="out"></div>';
     var steps=$('#steps'),out=$('#out');
     var els=q.steps.map(function(s){
       var d=document.createElement('div');d.className='step';
