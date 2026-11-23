@@ -220,7 +220,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 /* ===== Present mode: one slide at a time, with a slide picker ===== */
 [data-slide][hidden] { display: none !important; }
 .pbar, .pmenu { display: none; }
-body.present .pbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--pg-bg); border-top: 1px solid var(--rule-c); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); }
+body.present .pbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; justify-content: flex-start; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--pg-bg); border-top: 1px solid var(--rule-c); padding: 10px clamp(16px, 3vw, 40px) calc(10px + env(safe-area-inset-bottom, 0px)); }
 body.present { padding-bottom: 84px; }
 body.present footer.site, body.present #presentBtn, body.present .hero-actions { display: none; }
 body.present .stepper #controls, body.present .stepper .hint, body.present #start { display: none !important; }
@@ -230,13 +230,15 @@ body.present main > section { padding-top: 24px; }
 .pbtn:disabled { opacity: .4; cursor: default; }
 .pbtn:focus-visible, .pmenu button:focus-visible, .pdots button:focus-visible { outline: 3px solid var(--yellow-500); outline-offset: 2px; }
 .pcount .pn { font-variant-numeric: tabular-nums; opacity: .8; }
-.pcount .ptitle { max-width: 34ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pcount .caret { font-size: .7rem; opacity: .8; }
+.pcount { width: min(400px, 36vw); justify-content: flex-start; }
+.pcount .ptitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.pcount .caret { font-size: .7rem; opacity: .8; margin-left: auto; }
+#fsBtn { margin-left: auto; }
 .pdots { display: flex; gap: 6px; }
 .pdots button { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--pg-text-2); background: transparent; padding: 0; cursor: pointer; }
 .pdots button.sub { width: 8px; height: 8px; }
 .pdots button[aria-current="true"] { background: var(--yellow-500); border-color: var(--yellow-500); }
-body.present .pmenu:not([hidden]) { display: block; position: fixed; left: 50%; transform: translateX(-50%); bottom: var(--pbar-h, 78px); z-index: 80; width: min(480px, calc(100vw - 24px)); max-height: min(64vh, 480px); overflow: auto; background: var(--card); color: var(--pg-text); border: 1px solid var(--rule-c); border-radius: 14px; box-shadow: 0 8px 28px rgba(0,46,43,.22); padding: 8px; }
+body.present .pmenu:not([hidden]) { display: block; position: fixed; left: clamp(16px, 3vw, 40px); transform: none; bottom: var(--pbar-h, 78px); z-index: 80; width: min(480px, calc(100vw - 24px)); max-height: min(64vh, 480px); overflow: auto; background: var(--card); color: var(--pg-text); border: 1px solid var(--rule-c); border-radius: 14px; box-shadow: 0 8px 28px rgba(0,46,43,.22); padding: 8px; }
 .pmenu .mhead { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--tag-c); padding: 6px 12px 8px; }
 .pmenu button { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px; padding: 9px 12px; color: var(--pg-text); font: inherit; cursor: pointer; }
 .pmenu button:hover { background: var(--band); }
@@ -807,9 +809,9 @@ body.present main > section.polished:last-of-type { justify-content: center; }
 </script>
 <div class="pbar" id="pbar" role="group" aria-label="Presentation controls">
   <button class="pbtn" type="button" id="pprev">Back</button>
+  <button class="pbtn" type="button" id="pnext">Next</button>
   <button class="pbtn pcount" type="button" id="slideBtn" aria-haspopup="true" aria-expanded="false" aria-controls="pmenu" title="Choose a slide (S)"><span class="pn" id="pcount">1 / 1</span><span class="ptitle" id="ptitle">Overview</span><span class="caret" aria-hidden="true">&#9650;</span></button>
   <div class="pdots" id="pdots" role="group" aria-label="Slides"></div>
-  <button class="pbtn" type="button" id="pnext">Next</button>
   <button class="pbtn" type="button" id="fsBtn" title="Full screen (F)">Full screen</button>
   <button class="pbtn" type="button" id="exit" title="Exit present mode (Esc)">Exit</button>
 </div>
